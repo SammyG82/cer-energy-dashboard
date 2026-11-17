@@ -56,10 +56,9 @@ interface Props {
   /** Must be a stable module-level constant — inline object literals cause unnecessary recomputation. */
   displayNames?: Record<string, string>;
   presets?: PresetItem[];
-  isDark?: boolean;
 }
 
-export default function RegionPicker({ options, selected, onToggle, onSelectGroup, colorMap, displayNames = {}, presets = PRESETS, isDark = false }: Props) {
+export default function RegionPicker({ options, selected, onToggle, onSelectGroup, colorMap, displayNames = {}, presets = PRESETS }: Props) {
   const uid = useId();
   const dn = (r: string) => displayNames[r] ?? r;
   const [showCustom, setShowCustom] = useState(false);
@@ -125,12 +124,10 @@ export default function RegionPicker({ options, selected, onToggle, onSelectGrou
                 onSelectGroup(regions);
                 setShowCustom(false);
               }}
-              className={`px-3 py-1.5 text-sm font-medium rounded-full border transition-colors focus:outline-none focus:ring-2 ${isDark ? "focus:ring-white" : "focus:ring-slate-500"} ${
+              className={`px-3 py-1.5 text-sm font-medium rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 ${
                 isActive
                   ? "bg-teal-600 text-white border-teal-600"
-                  : isDark
-                    ? "bg-slate-800 text-slate-300 border-white/10 hover:border-teal-400 hover:text-teal-400"
-                    : "bg-white text-slate-600 border-slate-200 hover:border-teal-400 hover:text-teal-700"
+                  : "bg-white text-slate-600 border-slate-200 hover:border-teal-400 hover:text-teal-700"
               }`}
             >
               {preset.label}
@@ -145,12 +142,10 @@ export default function RegionPicker({ options, selected, onToggle, onSelectGrou
           aria-label="Select custom regions"
           aria-expanded={showCustom}
           aria-controls={`${uid}-custom`}
-          className={`px-3 py-1.5 text-sm font-medium rounded-full border transition-colors focus:outline-none focus:ring-2 ${isDark ? "focus:ring-white" : "focus:ring-slate-500"} ${
+          className={`px-3 py-1.5 text-sm font-medium rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 ${
             showCustom
               ? "bg-slate-700 text-white border-slate-700"
-              : isDark
-                ? "bg-slate-800 text-slate-400 border-white/10 hover:border-slate-400 hover:text-slate-300"
-                : "bg-white text-slate-400 border-slate-200 hover:border-slate-400 hover:text-slate-600"
+              : "bg-white text-slate-400 border-slate-200 hover:border-slate-400 hover:text-slate-600"
           }`}
         >
           Custom…
@@ -164,12 +159,10 @@ export default function RegionPicker({ options, selected, onToggle, onSelectGrou
           aria-label="Why these groups?"
           aria-expanded={showInfo}
           aria-controls={`${uid}-info`}
-          className={`w-11 h-11 md:w-8 md:h-8 rounded-full border text-xs font-bold flex items-center justify-center shrink-0 transition-colors focus:outline-none focus:ring-2 ${isDark ? "focus:ring-white" : "focus:ring-slate-500"} ${
+          className={`w-11 h-11 md:w-8 md:h-8 rounded-full border text-xs font-bold flex items-center justify-center shrink-0 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 ${
             showInfo
               ? "bg-teal-600 text-white border-teal-600"
-              : isDark
-                ? "bg-slate-800 text-slate-400 border-white/10 hover:border-teal-400 hover:text-teal-400"
-                : "bg-white text-slate-400 border-slate-300 hover:border-teal-400 hover:text-teal-600"
+              : "bg-white text-slate-400 border-slate-300 hover:border-teal-400 hover:text-teal-600"
           }`}
         >
           ?
@@ -177,12 +170,12 @@ export default function RegionPicker({ options, selected, onToggle, onSelectGrou
       </div>
 
       {showInfo && (
-        <div id={`${uid}-info`} role="region" aria-label="Why these groups?" onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); setShowInfo(false); infoBtnRef.current?.focus(); } }} className={`border rounded-xl p-4 flex flex-col gap-3 ${isDark ? "bg-white/10 border-white/10" : "bg-slate-50 border-slate-200"}`}>
-          <p className={`text-xs uppercase tracking-widest ${isDark ? "text-white/40" : "text-slate-400"}`}>Why these groups?</p>
+        <div id={`${uid}-info`} role="region" aria-label="Why these groups?" onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); setShowInfo(false); infoBtnRef.current?.focus(); } }} className="border rounded-xl p-4 flex flex-col gap-3 bg-slate-50 border-slate-200">
+          <p className="text-xs uppercase tracking-widest text-slate-400">Why these groups?</p>
           {presets.map(({ label, detail }) => (
             <div key={label}>
-              <p className={`text-sm font-semibold mb-0.5 ${isDark ? "text-white" : "text-slate-700"}`}>{label}</p>
-              <p className={`text-sm leading-relaxed ${isDark ? "text-white/60" : "text-slate-500"}`}>{detail}</p>
+              <p className="text-sm font-semibold mb-0.5 text-slate-700">{label}</p>
+              <p className="text-sm leading-relaxed text-slate-500">{detail}</p>
             </div>
           ))}
         </div>
@@ -198,12 +191,12 @@ export default function RegionPicker({ options, selected, onToggle, onSelectGrou
             onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); setShowCustom(false); customBtnRef.current?.focus(); } }}
             placeholder="Search regions…"
             aria-label="Search countries and regions"
-            className={`w-full pl-3 pr-3 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 ${isDark ? "focus:ring-white" : "focus:ring-slate-500"} ${isDark ? "bg-slate-800 border-white/10 text-white placeholder-slate-500" : "bg-white border-slate-200 text-slate-700 placeholder-slate-400"}`}
+            className="w-full pl-3 pr-3 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 bg-white border-slate-200 text-slate-700 placeholder-slate-400"
           />
 
           <div
             ref={listRef}
-            className={`border rounded-lg overflow-y-auto pb-1.5 ${isDark ? "border-white/10 bg-white/10" : "border-slate-200 bg-white"}`}
+            className="border rounded-lg overflow-y-auto pb-1.5 border-slate-200 bg-white"
             style={{ maxHeight: "clamp(150px, 40vh, 250px)" }}
             onKeyDown={(e) => {
               if (e.key === "Escape") { e.preventDefault(); setShowCustom(false); customBtnRef.current?.focus(); return; }
@@ -222,12 +215,12 @@ export default function RegionPicker({ options, selected, onToggle, onSelectGrou
             }}
           >
             {filtered.length === 0 ? (
-              <p role="status" className={`text-xs px-3 py-2 ${isDark ? "text-white/40" : "text-slate-400"}`}>No regions match.</p>
+              <p role="status" className="text-xs px-3 py-2 text-slate-400">No regions match.</p>
             ) : (
               filtered.map((region) => (
                 <label
                   key={region}
-                  className={`flex items-center gap-2.5 px-3 py-1.5 min-h-11 cursor-pointer select-none rounded focus-within:ring-2 focus-within:ring-offset-1 ${isDark ? "hover:bg-white/5 focus-within:ring-slate-400 focus-within:ring-offset-black" : "hover:bg-slate-50 focus-within:ring-slate-500 focus-within:ring-offset-white"}`}
+                  className="flex items-center gap-2.5 px-3 py-1.5 min-h-11 cursor-pointer select-none rounded focus-within:ring-2 focus-within:ring-offset-1 hover:bg-slate-50 focus-within:ring-slate-500 focus-within:ring-offset-white"
                 >
                   <input
                     type="checkbox"
@@ -235,7 +228,7 @@ export default function RegionPicker({ options, selected, onToggle, onSelectGrou
                     onChange={() => onToggle(region)}
                     className="w-3.5 h-3.5 shrink-0 focus:outline-none rounded"
                   />
-                  <span className={`text-sm flex-1 ${isDark ? "text-slate-300" : "text-slate-700"}`}>{dn(region)}</span>
+                  <span className="text-sm flex-1 text-slate-700">{dn(region)}</span>
                   <span
                     aria-hidden="true"
                     className="w-2.5 h-2.5 rounded-full shrink-0"
@@ -252,7 +245,7 @@ export default function RegionPicker({ options, selected, onToggle, onSelectGrou
       <p
         aria-live="polite"
         aria-atomic="true"
-        className={`text-xs ${!showCustom ? "sr-only" : ""} ${isDark ? "text-white/40" : "text-slate-400"}`}
+        className={`text-xs ${!showCustom ? "sr-only" : ""} text-slate-400`}
       >
         {showCustom ? `${selected.length} of ${options.length} selected` : ""}
       </p>

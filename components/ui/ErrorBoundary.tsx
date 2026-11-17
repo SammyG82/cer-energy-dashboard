@@ -18,13 +18,13 @@ export default class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.error) {
       return (
-        <div role="alert" className="flex flex-col items-center justify-center min-h-32 text-red-600 dark:text-red-400 text-sm px-4 text-center gap-2">
+        <div role="alert" className="flex flex-col items-center justify-center min-h-32 text-red-600 text-sm px-4 text-center gap-2">
           <span>Something went wrong loading this section.</span>
           {this.state.retries < 2 ? (
             <button
               onClick={() => this.setState((s) => ({ error: null, resetKey: s.resetKey + 1, retries: s.retries + 1 }))}
               aria-label="Try again loading this section"
-              className="text-xs underline mt-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 dark:focus:ring-white focus:ring-offset-white dark:focus:ring-offset-black rounded"
+              className="text-xs underline mt-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 focus:ring-offset-white rounded"
             >
               Try again
             </button>

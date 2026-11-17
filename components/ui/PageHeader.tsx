@@ -8,25 +8,24 @@ export interface PageHeaderProps {
   titleAccent?: string;
   subtitle: string;
   badges?: Badge[];
-  isDark?: boolean;
 }
 
 const badgeColors = {
-  teal:  { light: "bg-teal-50 text-teal-700 border-teal-200",   dark: "bg-teal-500/20 text-teal-300 border-teal-400/40" },
-  amber: { light: "bg-amber-50 text-amber-700 border-amber-200", dark: "bg-amber-500/20 text-amber-300 border-amber-400/40" },
-  blue:  { light: "bg-blue-50 text-blue-700 border-blue-200",   dark: "bg-blue-500/20 text-blue-300 border-blue-400/40" },
+  teal:  "bg-teal-50 text-teal-700 border-teal-200",
+  amber: "bg-amber-50 text-amber-700 border-amber-200",
+  blue:  "bg-blue-50 text-blue-700 border-blue-200",
 };
 
-export default function PageHeader({ title, titleAccent, subtitle, badges, isDark = false }: PageHeaderProps) {
+export default function PageHeader({ title, titleAccent, subtitle, badges }: PageHeaderProps) {
   return (
-    <div className={`border-b transition-colors duration-300 ${isDark ? "border-white/10 bg-black" : "border-slate-200 bg-white"}`}>
+    <div className="border-b transition-colors duration-300 border-slate-200 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10 flex flex-wrap items-start justify-between gap-6">
         <div>
-          <h1 className={`text-3xl sm:text-4xl font-bold tracking-tight ${isDark ? "text-white" : "text-slate-900"}`}>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
             {title}{" "}
-            {titleAccent && <span className={isDark ? "text-teal-400" : "text-teal-600"}>{titleAccent}</span>}
+            {titleAccent && <span className="text-teal-600">{titleAccent}</span>}
           </h1>
-          <p className={`mt-2 max-w-2xl text-sm leading-relaxed ${isDark ? "text-white/60" : "text-slate-600"}`}>{subtitle}</p>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">{subtitle}</p>
         </div>
         {badges && badges.length > 0 && (
           <div role="list" aria-label="Page labels" className="flex flex-col gap-1.5 self-end">
@@ -34,7 +33,7 @@ export default function PageHeader({ title, titleAccent, subtitle, badges, isDar
               <span
                 role="listitem"
                 key={label}
-                className={`text-xs font-mono uppercase tracking-wide px-2.5 py-1 rounded border ${badgeColors[color][isDark ? "dark" : "light"]}`}
+                className={`text-xs font-mono uppercase tracking-wide px-2.5 py-1 rounded border ${badgeColors[color]}`}
               >
                 {label}
               </span>

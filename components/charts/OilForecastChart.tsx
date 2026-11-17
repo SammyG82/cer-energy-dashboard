@@ -5,7 +5,7 @@ import * as d3 from "d3";
 import type { OilRow } from "@/lib/data";
 import { COUNTRY_COLORS } from "@/lib/data";
 import RegionPicker, { PresetItem } from "@/components/ui/RegionPicker";
-import { tooltipStyle, useContainerSize, toggleSelection, drawHorizontalGridLines, drawForecastBoundary, useThemeRef, useChartTheme, drawCrosshair, drawTickDot, useOilForecastBoundary, FORECAST_DASH } from "@/lib/ui-utils";
+import { tooltipStyle, useContainerSize, toggleSelection, drawHorizontalGridLines, drawForecastBoundary, drawCrosshair, drawTickDot, useOilForecastBoundary, FORECAST_DASH } from "@/lib/ui-utils";
 import StatCard from "@/components/ui/StatCard";
 import ChartLegend from "@/components/ui/ChartLegend";
 import PreviewTooltip from "@/components/ui/PreviewTooltip";
@@ -18,7 +18,6 @@ const dnOil = (c: string) => OIL_DISPLAY[c] ?? c;
 interface Props {
   data: OilRow[];
   preview?: boolean;
-  isDark?: boolean;
   datasetLabel?: "Oil Imports (KBD)" | "Net Trade (KBD)" | "Oil Exports (KBD)";
   chartPresets?: PresetItem[];
   statYear?: number;
@@ -32,12 +31,11 @@ interface Pinned {
 
 const PREVIEW_COUNTRIES = ["China", "India", "USA", "Japan", "Korea"];
 
-export default function OilForecastChart({ data, preview = false, isDark = false, datasetLabel = "Oil Imports (KBD)", chartPresets, statYear }: Props) {
+export default function OilForecastChart({ data, preview = false, datasetLabel = "Oil Imports (KBD)", chartPresets, statYear }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const clipId = `oil-ci-clip-${useId().replace(/:/g, "-")}`;
   const { width: containerWidth, height: containerHeight } = useContainerSize(containerRef);
-  const isDarkRef = useThemeRef(isDark);
   const [pinned, setPinned] = useState<Pinned | null>(null);
   const [previewTooltip, setPreviewTooltip] = useState<Pinned | null>(null);
   const [previewTooltipPos, setPreviewTooltipPos] = useState<{ x: number; y: number } | null>(null);
@@ -172,9 +170,9 @@ export default function OilForecastChart({ data, preview = false, isDark = false
     g.append("defs").append("clipPath").attr("id", clipId)
       .append("rect").attr("width", width).attr("height", height);
 
-    drawHorizontalGridLines(g, y, width, 5, isDarkRef.current);
+    drawHorizontalGridLines(g, y, width, 5);
 
-    if (isFinite(forecastBoundary)) drawForecastBoundary(g, x, forecastBoundary, height, isDarkRef.current);
+    if (isFinite(forecastBoundary)) drawForecastBoundary(g, x, forecastBoundary, height);
 
     const countryRows = new Map(
       activeCountries.map((c) => [c, activeData.filter((d) => d.Country === c).sort((a, b) => a.Year - b.Year)])
@@ -224,7 +222,7 @@ export default function OilForecastChart({ data, preview = false, isDark = false
       tickYears.forEach((yr) => {
         const row = dataIndex.get(`${country}|${yr}`);
         if (!row) return;
-        drawTickDot(g, x(yr), y(row.value), color, isDarkRef);
+        drawTickDot(g, x(yr), y(row.value), color);
       });
     });
 
@@ -238,7 +236,7 @@ export default function OilForecastChart({ data, preview = false, isDark = false
         return n >= 1000 || n <= -1000 ? `${(n / 1000).toFixed(0)}k` : `${Math.round(n)}`;
       }).ticks(5));
 
-    const crosshair = drawCrosshair(g, height, isDarkRef);
+    const crosshair = drawCrosshair(g, height);
 
     let lastPinnedYear: number | null = null;
     g.append("rect")
@@ -282,8 +280,6 @@ export default function OilForecastChart({ data, preview = false, isDark = false
       });
   }, [data, allCountries, selectedSet, preview, forecastBoundary, containerWidth, clipId]);
 
-  useChartTheme(svgRef, isDark);
-
   return (
     <div className="flex flex-col gap-4">
       {!preview && (
@@ -296,16 +292,16 @@ export default function OilForecastChart({ data, preview = false, isDark = false
                   value={hasImporters
                     ? (displayNetDeficit > 0 ? `${Math.round(displayNetDeficit).toLocaleString()} KBD` : "—")
                     : (displayNetSurplus > 0 ? `${Math.round(displayNetSurplus).toLocaleString()} KBD` : "—")}
-                  accent="blue" isDark={isDark} />
+                  accent="blue" />
                 <StatCard size="xl"
                   label={`${displayIsForecast ? "Projected " : ""}${hasImporters ? "Largest Net Importer" : "Largest Net Exporter"}`}
                   value={hasImporters ? (displayNetImporter ? dnOil(displayNetImporter) : "—") : (displayNetExporterName ? dnOil(displayNetExporterName) : "—")}
-                  accent="teal" isDark={isDark} />
+                  accent="teal" />
               </>
             ) : (
               <>
-                <StatCard size="xl" label={`${displayIsForecast ? "Projected " : ""}${displayYear} Total`} value={`${Math.round(displayTotal).toLocaleString()} KBD`} accent="blue" isDark={isDark} />
-                <StatCard size="xl" label={`${displayIsForecast ? "Projected " : ""}${datasetLabel === "Oil Exports (KBD)" ? "Largest Exporter" : "Largest Importer"}`} value={displayLeader ? dnOil(displayLeader) : "—"} accent="teal" isDark={isDark} />
+                <StatCard size="xl" label={`${displayIsForecast ? "Projected " : ""}${displayYear} Total`} value={`${Math.round(displayTotal).toLocaleString()} KBD`} accent="blue" />
+                <StatCard size="xl" label={`${displayIsForecast ? "Projected " : ""}${datasetLabel === "Oil Exports (KBD)" ? "Largest Exporter" : "Largest Importer"}`} value={displayLeader ? dnOil(displayLeader) : "—"} accent="teal" />
               </>
             )}
           </div>
@@ -318,12 +314,11 @@ export default function OilForecastChart({ data, preview = false, isDark = false
             colorMap={COUNTRY_COLORS}
             displayNames={OIL_DISPLAY}
             presets={chartPresets ?? OIL_IMPORT_PRESETS}
-            isDark={isDark}
           />
         </>
       )}
 
-      <ChartLegend isDark={isDark} showCI />
+      <ChartLegend showCI />
 
       <div ref={containerRef} className="w-full relative" style={{ touchAction: "pan-y" }}>
         <svg ref={svgRef} className="w-full" role="img" aria-label={ariaLabel} />
@@ -338,7 +333,6 @@ export default function OilForecastChart({ data, preview = false, isDark = false
               unit: "KBD",
               color,
             }))}
-            isDark={isDark}
             footer="KBD = thousands of barrels/day"
             style={tooltipStyle(previewTooltipPos.x, previewTooltipPos.y, containerWidth, containerHeight, 150, 240)}
           />
@@ -347,7 +341,6 @@ export default function OilForecastChart({ data, preview = false, isDark = false
 
       {!preview && (
         <PinnedPanel
-          isDark={isDark}
           emptyText="Tap or hover the chart to explore oil volumes by year"
           headerNote="Thousands of barrels per day"
           footer="KBD = thousands of barrels per day"

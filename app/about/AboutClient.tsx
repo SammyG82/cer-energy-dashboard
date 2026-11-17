@@ -1,22 +1,18 @@
 "use client";
 
-import { useTheme } from "@/lib/theme-context";
-import FadeIn from "@/components/ui/FadeIn";
 import PageHeader from "@/components/ui/PageHeader";
 import { BASE } from "@/lib/data";
 
 export default function AboutClient() {
-  const { isDark } = useTheme();
-
   return (
-    <div className={`min-h-screen pb-16 transition-colors duration-300 ${isDark ? "bg-black text-white" : "bg-white text-slate-900"}`}>
-      <PageHeader title="About" subtitle="Project background, data sources, and research methodology" isDark={isDark} />
+    <div className="min-h-screen pb-16 transition-colors duration-300 bg-white text-slate-900">
+      <PageHeader title="About" subtitle="Project background, data sources, and research methodology" />
       <div className="max-w-4xl mx-auto px-4 sm:px-8 md:px-12 py-16">
 
         {/* The Project */}
-        <FadeIn><section className="mb-16" aria-labelledby="about-the-project">
-          <h2 id="about-the-project" className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-slate-900"}`}>The Project</h2>
-          <p className={`text-lg leading-relaxed mb-8 ${isDark ? "text-white/60" : "text-slate-700"}`}>
+        <section className="mb-16" aria-labelledby="about-the-project">
+          <h2 id="about-the-project" className="text-xl font-bold mb-6 text-slate-900">The Project</h2>
+          <p className="text-lg leading-relaxed mb-8 text-slate-700">
             The central research question is whether rising EV adoption in non-oil-producing countries leads to measurable reductions in oil imports, and what the potential fiscal dividend of those savings might be.
           </p>
 
@@ -27,31 +23,31 @@ export default function AboutClient() {
               { title: "Infrastructure Dividend", body: "Reduced oil imports free foreign exchange reserves. Conservative estimates of fuel and import displacement translate to billions of dollars in available public sector savings to invest in electricity grid and clean-transition infrastructure." },
               { title: "Caveats", body: "Oil demand is shaped by many factors beyond passenger vehicles — industry, shipping, and heating. These estimates are indicative, not causal: GDP growth and energy-mix shifts are not controlled for. The analysis focuses specifically on light-vehicle transport fuel displacement." },
             ].map(({ title, body }) => (
-              <div key={title} className={`p-4 rounded-2xl border backdrop-blur-sm ${isDark ? "bg-white/5 border-white/10" : "bg-slate-50/50 border-slate-200/50"}`}>
-                <h3 className={`font-semibold mb-2 ${isDark ? "text-white" : "text-slate-900"}`}>{title}</h3>
-                <p className={`text-sm ${isDark ? "text-white/60" : "text-black/70"}`}>{body}</p>
+              <div key={title} className="p-4 rounded-2xl border backdrop-blur-sm bg-slate-50/50 border-slate-200/50">
+                <h3 className="font-semibold mb-2 text-slate-900">{title}</h3>
+                <p className="text-sm text-black/70">{body}</p>
               </div>
             ))}
           </div>
-        </section></FadeIn>
+        </section>
 
         {/* Key Variables */}
-        <FadeIn><section className="mb-16" aria-labelledby="about-key-variables">
-          <h2 id="about-key-variables" className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-slate-900"}`}>Key Variables</h2>
-          <p className={`text-lg leading-relaxed mb-6 ${isDark ? "text-white/60" : "text-slate-700"}`}>
+        <section className="mb-16" aria-labelledby="about-key-variables">
+          <h2 id="about-key-variables" className="text-xl font-bold mb-6 text-slate-900">Key Variables</h2>
+          <p className="text-lg leading-relaxed mb-6 text-slate-700">
             The table below lists the primary variables used across the project&apos;s data files. Each chart reads its own independent file at runtime — there is no single merged dataset. Derived columns are computed in the browser from source data.
           </p>
 
-          <div className={`relative p-6 rounded-3xl border backdrop-blur-sm ${isDark ? "bg-white/5 border-white/10" : "bg-slate-50/50 border-slate-200/50"}`}>
+          <div className="relative p-6 rounded-3xl border backdrop-blur-sm bg-slate-50/50 border-slate-200/50">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <caption className="sr-only">Key variables used in the DS3 Energy Dashboard data files</caption>
+                <caption className="sr-only">Key variables used in the CER Energy Dashboard data files</caption>
                 <thead>
-                  <tr className={`border-b ${isDark ? "border-white/10" : "border-slate-200"}`}>
-                    <th scope="col" className={`text-left py-3 px-4 text-xs uppercase tracking-widest ${isDark ? "text-white/50" : "text-black/60"}`}>Variable</th>
-                    <th scope="col" className={`text-left py-3 px-4 text-xs uppercase tracking-widest ${isDark ? "text-white/50" : "text-black/60"}`}>Description</th>
-                    <th scope="col" className={`text-left py-3 px-4 text-xs uppercase tracking-widest ${isDark ? "text-white/50" : "text-black/60"}`}>Unit</th>
-                    <th scope="col" className={`text-left py-3 px-4 text-xs uppercase tracking-widest ${isDark ? "text-white/50" : "text-black/60"}`}>Source</th>
+                  <tr className="border-b border-slate-200">
+                    <th scope="col" className="text-left py-3 px-4 text-xs uppercase tracking-widest text-black/60">Variable</th>
+                    <th scope="col" className="text-left py-3 px-4 text-xs uppercase tracking-widest text-black/60">Description</th>
+                    <th scope="col" className="text-left py-3 px-4 text-xs uppercase tracking-widest text-black/60">Unit</th>
+                    <th scope="col" className="text-left py-3 px-4 text-xs uppercase tracking-widest text-black/60">Source</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -67,16 +63,16 @@ export default function AboutClient() {
                     { name: "oil_import_delta", desc: "Year-over-year change in oil import volume", unit: "kb/d (Δ)", tags: ["DERIVED"] },
                     { name: "estimated_savings", desc: "Estimated financial value of oil import reduction attributed to EV adoption, at a reference oil price.", unit: "USD billions", tags: ["DERIVED"] },
                   ].map((row, i, arr) => (
-                    <tr key={row.name} className={i < arr.length - 1 ? `border-b ${isDark ? "border-white/5" : "border-slate-100"}` : ""}>
-                      <td className={`py-3 px-4 text-sm font-mono ${isDark ? "text-teal-400" : "text-teal-600"}`}>{row.name}</td>
-                      <td className={`py-3 px-4 text-sm ${isDark ? "text-white/90" : "text-black/80"}`}>{row.desc}</td>
-                      <td className={`py-3 px-4 text-sm ${isDark ? "text-white/60" : "text-black/60"}`}>{row.unit}</td>
+                    <tr key={row.name} className={i < arr.length - 1 ? "border-b border-slate-100" : ""}>
+                      <td className="py-3 px-4 text-sm font-mono text-teal-600">{row.name}</td>
+                      <td className="py-3 px-4 text-sm text-black/80">{row.desc}</td>
+                      <td className="py-3 px-4 text-sm text-black/60">{row.unit}</td>
                       <td className="py-3 px-4 text-xs">
                         <div className="flex flex-col gap-1.5 items-start">
                           {row.tags.map((tag) => (
                             <span
                               key={tag}
-                              className={`inline-block px-2 py-1 rounded ${isDark ? "bg-white/10 text-white/50" : "bg-black/5 text-black/40"}`}
+                              className="inline-block px-2 py-1 rounded bg-black/5 text-black/40"
                             >
                               {tag}
                             </span>
@@ -88,16 +84,16 @@ export default function AboutClient() {
                 </tbody>
               </table>
             </div>
-            <div className={`pointer-events-none absolute inset-y-0 right-0 w-12 bg-linear-to-l ${isDark ? "from-black" : "from-white"} to-transparent sm:hidden`} aria-hidden="true" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-linear-to-l from-white to-transparent sm:hidden" aria-hidden="true" />
           </div>
-        </section></FadeIn>
+        </section>
 
         {/* Methodology */}
-        <FadeIn><section className="mb-16" aria-labelledby="about-methodology">
-          <h2 id="about-methodology" className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-slate-900"}`}>Methodology</h2>
+        <section className="mb-16" aria-labelledby="about-methodology">
+          <h2 id="about-methodology" className="text-xl font-bold mb-6 text-slate-900">Methodology</h2>
 
           <div className="mb-8">
-            <h3 className={`text-lg font-medium mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>Dataset Sources</h3>
+            <h3 className="text-lg font-medium mb-4 text-slate-900">Dataset Sources</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               {[
@@ -112,9 +108,9 @@ export default function AboutClient() {
                 },
                 {
                   title: "EV Sales & Forecast Data",
-                  desc: "BEV sales by country and year, 2010–2035. ev_sales.csv contains IEA STEPS projections (used by the Rankings and Trend charts). ev_data.json contains DS3 logistic S-curve projections fitted per country (used by the Projections chart). The files use different forecasting methods and are not interchangeable.",
+                  desc: "BEV sales by country and year, 2010–2035. ev_sales.csv contains IEA STEPS projections (used by the Rankings and Trend charts). ev_data.json contains CER logistic S-curve projections fitted per country (used by the Projections chart). The files use different forecasting methods and are not interchangeable.",
                   rows: "1,297 rows",
-                  source: "IEA Global EV Outlook 2025 (historical) + DS3 logistic S-curve model (projections)",
+                  source: "IEA Global EV Outlook 2025 (historical) + CER logistic S-curve model (projections)",
                   license: "IEA Terms of Use (historical data)",
                   columns: "region_country, year, ev_sales, type",
                   files: ["ev_sales.csv", "ev_data.json"],
@@ -132,7 +128,7 @@ export default function AboutClient() {
                   title: "Net Trade Forecast",
                   desc: "Combined ARIMA forecasts for oil exports and imports with derived net trade position per country through 2030.",
                   rows: "1,200 rows",
-                  source: "Derived from IEA Oil Information Database — DS3 model",
+                  source: "Derived from IEA Oil Information Database — CER model",
                   license: "Open",
                   columns: "Country, Year, Type, Net_Trade, Net_CI_Low, Net_CI_High, Exports, Imports, Exports_Order, Imports_Order, Avg_MAPE",
                   files: ["net_trade_forecast.csv"],
@@ -158,11 +154,11 @@ export default function AboutClient() {
               ].map(({ title, desc, rows, source, license, columns, files }) => (
                 <div
                   key={title}
-                  className={`p-4 rounded-2xl border backdrop-blur-sm ${isDark ? "bg-white/5 border-white/10" : "bg-slate-50/50 border-slate-200/50"}`}
+                  className="p-4 rounded-2xl border backdrop-blur-sm bg-slate-50/50 border-slate-200/50"
                 >
-                  <h4 className={`font-semibold mb-2 ${isDark ? "text-white" : "text-slate-900"}`}>{title}</h4>
-                  <p className={`text-sm mb-3 ${isDark ? "text-white/60" : "text-black/70"}`}>{desc}</p>
-                  <div className={`text-xs space-y-1 ${isDark ? "text-white/60" : "text-black/60"}`}>
+                  <h4 className="font-semibold mb-2 text-slate-900">{title}</h4>
+                  <p className="text-sm mb-3 text-black/70">{desc}</p>
+                  <div className="text-xs space-y-1 text-black/60">
                     <div><span className="font-medium">Rows:</span> {rows}</div>
                     <div><span className="font-medium">Source:</span> {source}</div>
                     <div><span className="font-medium">License:</span> {license}</div>
@@ -175,7 +171,7 @@ export default function AboutClient() {
                         href={`${BASE}/data/${f}`}
                         download
                         aria-label={`Download ${f}`}
-                        className={`inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border transition-colors focus:outline-none focus:ring-2 ${isDark ? "focus:ring-white" : "focus:ring-slate-500"} ${isDark ? "border-white/10 text-teal-400 hover:border-white/30" : "border-slate-200 text-teal-700 hover:border-slate-400"}`}
+                        className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 border-slate-200 text-teal-700 hover:border-slate-400"
                       >
                         {f}
                         <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 1v6M2 7l3 2 3-2" /></svg>
@@ -186,17 +182,17 @@ export default function AboutClient() {
               ))}
             </div>
 
-            <h3 className={`text-lg font-medium mb-3 mt-8 ${isDark ? "text-white" : "text-slate-900"}`}>Dataset description</h3>
-            <p className={`text-base leading-relaxed mb-6 ${isDark ? "text-white/60" : "text-slate-700"}`}>
-              All charts draw on publicly available International Energy Agency (IEA) datasets. Historical oil trade data spans 1971–2023, with ARIMA forecasts through 2030 — the imports model covers the top 10 importers by 2023 volume; exports and net trade cover 20 countries each. EV data spans 56 regions from 2010–2035: historical figures (2010–2024) from the IEA Global EV Outlook, extended through 2035 via DS3 logistic S-curve models fitted per country.
+            <h3 className="text-lg font-medium mb-3 mt-8 text-slate-900">Dataset description</h3>
+            <p className="text-base leading-relaxed mb-6 text-slate-700">
+              All charts draw on publicly available International Energy Agency (IEA) datasets. Historical oil trade data spans 1971–2023, with ARIMA forecasts through 2030 — the imports model covers the top 10 importers by 2023 volume; exports and net trade cover 20 countries each. EV data spans 56 regions from 2010–2035: historical figures (2010–2024) from the IEA Global EV Outlook, extended through 2035 via CER logistic S-curve models fitted per country.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-              <div className={`relative p-6 rounded-3xl border overflow-hidden backdrop-blur-sm ${isDark ? "bg-white/5 border-white/10" : "bg-slate-50/50 border-slate-200/50"}`}>
+              <div className="relative p-6 rounded-3xl border overflow-hidden backdrop-blur-sm bg-slate-50/50 border-slate-200/50">
                 <div className="mb-4">
-                  <h4 className={`text-lg font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>Oil Import / Export Dataset</h4>
+                  <h4 className="text-lg font-semibold text-slate-900">Oil Import / Export Dataset</h4>
                 </div>
-                <p className={`text-xs font-mono uppercase tracking-widest mb-4 ${isDark ? "text-white/50" : "text-black/60"}`}>International Energy Agency (IEA)</p>
+                <p className="text-xs font-mono uppercase tracking-widest mb-4 text-black/60">International Energy Agency (IEA)</p>
                 <div className="space-y-3 mb-4">
                   {[
                     { label: "SOURCE", value: "IEA Oil Information" },
@@ -206,51 +202,51 @@ export default function AboutClient() {
                     { label: "GRANULARITY", value: "Country-level, annual" },
                   ].map(({ label, value }) => (
                     <div key={label} className="grid grid-cols-[80px_1fr] sm:grid-cols-[100px_1fr] gap-2">
-                      <span className={`text-xs font-mono uppercase tracking-widest ${isDark ? "text-white/50" : "text-black/60"}`}>{label}</span>
-                      <span className={`text-sm ${isDark ? "text-white/90" : "text-black/80"}`}>{value}</span>
+                      <span className="text-xs font-mono uppercase tracking-widest text-black/60">{label}</span>
+                      <span className="text-sm text-black/80">{value}</span>
                     </div>
                   ))}
                 </div>
-                <p className={`text-sm leading-relaxed ${isDark ? "text-white/60" : "text-black/60"}`}>
+                <p className="text-sm leading-relaxed text-black/60">
                   Records crude oil and petroleum product import and export volumes by country. Used to derive net import position and to identify countries whose oil supply is predominantly import-dependent (i.e. non-major-exporters).
                 </p>
               </div>
 
-              <div className={`relative p-6 rounded-3xl border overflow-hidden backdrop-blur-sm ${isDark ? "bg-white/5 border-white/10" : "bg-slate-50/50 border-slate-200/50"}`}>
+              <div className="relative p-6 rounded-3xl border overflow-hidden backdrop-blur-sm bg-slate-50/50 border-slate-200/50">
                 <div className="mb-4">
-                  <h4 className={`text-lg font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>EV Sales & Market Growth Dataset</h4>
+                  <h4 className="text-lg font-semibold text-slate-900">EV Sales & Market Growth Dataset</h4>
                 </div>
-                <p className={`text-xs font-mono uppercase tracking-widest mb-4 ${isDark ? "text-white/50" : "text-black/60"}`}>International Energy Agency (IEA)</p>
+                <p className="text-xs font-mono uppercase tracking-widest mb-4 text-black/60">International Energy Agency (IEA)</p>
                 <div className="space-y-3 mb-4">
                   {[
-                    { label: "SOURCE", value: "IEA Global EV Outlook 2025 + DS3 S-curve (projections)" },
+                    { label: "SOURCE", value: "IEA Global EV Outlook 2025 + CER S-curve (projections)" },
                     { label: "COVERAGE", value: "2010–2035 (annual)" },
                     { label: "UNIT", value: "Vehicles sold; market share (%)" },
                     { label: "COUNTRIES", value: "56 countries / regions" },
                     { label: "GRANULARITY", value: "Country-level, annual" },
                   ].map(({ label, value }) => (
                     <div key={label} className="grid grid-cols-[80px_1fr] sm:grid-cols-[100px_1fr] gap-2">
-                      <span className={`text-xs font-mono uppercase tracking-widest ${isDark ? "text-white/50" : "text-black/60"}`}>{label}</span>
-                      <span className={`text-sm ${isDark ? "text-white/90" : "text-black/80"}`}>{value}</span>
+                      <span className="text-xs font-mono uppercase tracking-widest text-black/60">{label}</span>
+                      <span className="text-sm text-black/80">{value}</span>
                     </div>
                   ))}
                 </div>
-                <p className={`text-sm leading-relaxed ${isDark ? "text-white/60" : "text-black/60"}`}>
+                <p className="text-sm leading-relaxed text-black/60">
                   Captures annual BEV sales figures by country and region, enabling calculation of each market&apos;s EV growth trajectory and relative share across selected countries.
                 </p>
               </div>
             </div>
           </div>
-        </section></FadeIn>
+        </section>
 
         {/* Data Processing */}
-        <FadeIn><section className="mb-16" aria-labelledby="about-data-processing">
-          <h2 id="about-data-processing" className={`text-xl font-bold mb-6 ${isDark ? "text-white" : "text-slate-900"}`}>Data Processing</h2>
-          <p className={`text-lg leading-relaxed mb-6 ${isDark ? "text-white/60" : "text-slate-700"}`}>
+        <section className="mb-16" aria-labelledby="about-data-processing">
+          <h2 id="about-data-processing" className="text-xl font-bold mb-6 text-slate-900">Data Processing</h2>
+          <p className="text-lg leading-relaxed mb-6 text-slate-700">
             The following pipeline was applied to transform raw IEA data into the analytical dataset used throughout this project:
           </p>
 
-          <div className={`relative p-6 rounded-3xl border overflow-hidden backdrop-blur-sm ${isDark ? "bg-white/5 border-white/10" : "bg-slate-50/50 border-slate-200/50"}`}>
+          <div className="relative p-6 rounded-3xl border overflow-hidden backdrop-blur-sm bg-slate-50/50 border-slate-200/50">
             <div className="space-y-6">
               {[
                 {
@@ -285,18 +281,18 @@ export default function AboutClient() {
                 },
               ].map(({ num, title, body }) => (
                 <div key={num} className="flex gap-3 items-start">
-                  <div className={`shrink-0 w-10 h-10 rounded-lg flex items-center justify-center -mt-2 ${isDark ? "bg-white/10" : "bg-black/5"}`}>
-                    <span className={`text-xs font-semibold ${isDark ? "text-white/50" : "text-black/60"}`}>{num}</span>
+                  <div className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center -mt-2 bg-black/5">
+                    <span className="text-xs font-semibold text-black/60">{num}</span>
                   </div>
                   <div className="flex-1">
-                    <h3 className={`font-semibold mb-2 ${isDark ? "text-white" : "text-slate-900"}`}>{title}</h3>
-                    <p className={`text-sm leading-relaxed ${isDark ? "text-white/60" : "text-black/60"}`}>{body}</p>
+                    <h3 className="font-semibold mb-2 text-slate-900">{title}</h3>
+                    <p className="text-sm leading-relaxed text-black/60">{body}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </section></FadeIn>
+        </section>
 
       </div>
     </div>

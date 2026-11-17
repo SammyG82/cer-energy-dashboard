@@ -1,14 +1,14 @@
-# DS3 Energy Dashboard — EV Adoption & Oil Dependency
+# CER Energy Dashboard — EV Adoption & Oil Dependency
 
 A data-driven dashboard exploring whether rising electric vehicle adoption measurably reduces oil dependency in oil-importing countries, and how the resulting savings could fund clean energy infrastructure.
 
-**Live site:** https://sammyg82.github.io/ds3-energy-dashboard/
+**Live site:** https://sammyg82.github.io/cer-energy-dashboard/
 
 ---
 
 ## Overview
 
-This project combines IEA oil import/export data with global EV sales figures across 50+ countries, spanning 1971–2023 for oil trade and 2010–2035 for EV sales. Oil forecasts extend through 2030 using Log-ARIMA models. EV projections use a DS3 logistic S-curve model fitted per country to IEA historical data. The dashboard supports light and dark modes.
+This project combines IEA oil import/export data with global EV sales figures across 50+ countries, spanning 1971–2023 for oil trade and 2010–2035 for EV sales. Oil forecasts extend through 2030 using Log-ARIMA models. EV projections use a CER logistic S-curve model fitted per country to IEA historical data.
 
 ## Key Metrics
 
@@ -24,7 +24,7 @@ This project combines IEA oil import/export data with global EV sales figures ac
 | Page | Description |
 |---|---|
 | **Landing** (`/`) | Summary statistics, preview charts, and project goals |
-| **EV Forecast** (`/ev-forecast/`) | Top EV markets ranked by year; single-country trend; multi-region DS3 S-curve projections through 2035 |
+| **EV Forecast** (`/ev-forecast/`) | Top EV markets ranked by year; single-country trend; multi-region CER S-curve projections through 2035 |
 | **EV GDP Impact** (`/ev-gdp-impact/`) | EV adoption's economic impact — displaced barrels, cost savings, and GDP share by country; Oil Explorer with import, export, and net trade forecasts |
 | **About** (`/about/`) | Project background, methodology, and dataset documentation |
 
@@ -38,13 +38,13 @@ This project combines IEA oil import/export data with global EV sales figures ac
 ## Methodology
 
 - Oil forecasts use Log-ARIMA models fitted per country (grid search over (p,d,q) by AIC, 95% CI bands through 2030)
-- EV projections use a DS3 logistic S-curve model fitted per country to IEA historical BEV sales data, constrained to 1.2–10× the observed peak, projected through 2035
+- EV projections use a CER logistic S-curve model fitted per country to IEA historical BEV sales data, constrained to 1.2–10× the observed peak, projected through 2035
 - GDP impact estimates multiply displaced barrels by a reference oil price and express the result as a share of GDP
 
 ## Project Structure
 
 ```
-ds3-energy-dashboard/
+cer-energy-dashboard/
 ├── public/data/                         # Static data files (CSV/JSON) for charts
 ├── app/                                 # All pages and layouts (Next.js App Router)
 ├── components/
@@ -61,8 +61,8 @@ Welcome to the project. Follow these steps to get fully set up.
 
 **1. Clone the repo**
 ```bash
-git clone https://github.com/SammyG82/ds3-energy-dashboard.git
-cd ds3-energy-dashboard
+git clone https://github.com/SammyG82/cer-energy-dashboard.git
+cd cer-energy-dashboard
 ```
 
 **2. Set up the frontend**
@@ -75,7 +75,7 @@ Open [http://localhost:3000](http://localhost:3000) — the dashboard should be 
 **3. Set up Python (only needed if you're working on the data notebooks)**
 ```bash
 conda env create -f environment.yml
-conda activate ds3-energy
+conda activate cer-energy
 jupyter notebook
 ```
 Notebooks live in `analysis/` and `eda/`. Always run them from inside their own folder (some load data via relative paths).
@@ -98,14 +98,14 @@ c. Push the branch to GitHub:
    git push origin your-branch-name
    ```
 d. Open a pull request on GitHub:
-   - Go to the repo at https://github.com/SammyG82/ds3-energy-dashboard
+   - Go to the repo at https://github.com/SammyG82/cer-energy-dashboard
    - You'll see a yellow banner at the top: **"your-branch-name had recent pushes — Compare & pull request"**
    - Click **"Compare & pull request"**
    - Add a title and description, then click **"Create pull request"**
    - Once you're happy with the changes and there are no merge conflicts, click **"Merge pull request"** — the live site will redeploy automatically
 
 **5. Get oriented**
-- The live site is at https://sammyg82.github.io/ds3-energy-dashboard/ — any push to `main` auto-deploys
+- The live site is at https://sammyg82.github.io/cer-energy-dashboard/ — any push to `main` auto-deploys
 - All frontend data files are in `public/data/` — charts read from there, never from `analysis/`
 - Chart components are in `components/charts/`, one file per chart
 - All data fetching and shared EV utilities are in `lib/data.ts`

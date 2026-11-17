@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import * as d3 from "d3";
 import type { EvRow } from "@/lib/data";
 import { fmtEvSales, dn, AGGREGATES } from "@/lib/data";
-import { useContainerSize, drawHorizontalGridLines, drawForecastBoundary, useThemeRef, useChartTheme, drawCrosshair, drawTickDot, useEvForecastBoundary, FORECAST_DASH } from "@/lib/ui-utils";
+import { useContainerSize, drawHorizontalGridLines, drawForecastBoundary, drawCrosshair, drawTickDot, useEvForecastBoundary, FORECAST_DASH } from "@/lib/ui-utils";
 import ForecastBadge from "@/components/ui/ForecastBadge";
 import ChartLegend from "@/components/ui/ChartLegend";
 import StatCard from "@/components/ui/StatCard";
@@ -14,7 +14,6 @@ const EV_TREND_COLOR = "#0d9488";
 
 interface Props {
   data: EvRow[];
-  isDark?: boolean;
 }
 
 interface Pinned {
@@ -26,12 +25,11 @@ interface Pinned {
 
 const FORECAST_TARGET_YEAR = 2030;
 
-export default function EvTrendChart({ data, isDark = false }: Props) {
+export default function EvTrendChart({ data }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { width: containerWidth } = useContainerSize(containerRef);
   const [pinned, setPinned] = useState<Pinned | null>(null);
-  const isDarkRef = useThemeRef(isDark);
 
   const countries = useMemo(
     () => Array.from(new Set(data.map((d) => d.region_country))).filter((c) => !AGGREGATES.has(c)).sort((a, b) => dn(a).localeCompare(dn(b))),
@@ -81,10 +79,10 @@ export default function EvTrendChart({ data, isDark = false }: Props) {
       .nice()
       .range([height, 0]);
 
-    drawHorizontalGridLines(g, y, width, 5, isDarkRef.current);
+    drawHorizontalGridLines(g, y, width, 5);
 
     if (forecast.length > 0) {
-      drawForecastBoundary(g, x, forecastBoundary, height, isDarkRef.current);
+      drawForecastBoundary(g, x, forecastBoundary, height);
     }
 
     const line = d3.line<EvRow>()
@@ -120,7 +118,7 @@ export default function EvTrendChart({ data, isDark = false }: Props) {
     tickYears.forEach((yr) => {
       const row = byYear.get(yr);
       if (!row) return;
-      drawTickDot(g, x(yr), y(row.ev_sales), EV_TREND_COLOR, isDarkRef);
+      drawTickDot(g, x(yr), y(row.ev_sales), EV_TREND_COLOR);
     });
 
     g.append("g").attr("class", "chart-axis").attr("transform", `translate(0,${height})`)
@@ -129,7 +127,7 @@ export default function EvTrendChart({ data, isDark = false }: Props) {
     g.append("g").attr("class", "chart-axis")
       .call(d3.axisLeft(y).tickFormat((v) => fmtEvSales(+v)).ticks(5));
 
-    const crosshair = drawCrosshair(g, height, isDarkRef);
+    const crosshair = drawCrosshair(g, height);
 
     let lastPinnedYear: number | null = null;
     g.append("rect")
@@ -157,8 +155,6 @@ export default function EvTrendChart({ data, isDark = false }: Props) {
         // Intentional: pinned panel stays frozen at the last hovered year — do not call setPinned(null) here
       });
   }, [countryData, forecastBoundary, containerWidth]);
-
-  useChartTheme(svgRef, isDark);
 
   const historicalRows = useMemo(() => countryData.filter((d) => d.type === "Actual" && d.year <= forecastBoundary), [countryData, forecastBoundary]);
 
@@ -189,32 +185,32 @@ export default function EvTrendChart({ data, isDark = false }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3 flex-wrap">
-        <label htmlFor="trend-country-select" className={`text-xs font-mono uppercase tracking-widest ${isDark ? "text-white/40" : "text-slate-400"}`}>Country</label>
-        <Select id="trend-country-select" value={country} onChange={setCountry} options={countries} displayName={dn} isDark={isDark} />
+        <label htmlFor="trend-country-select" className="text-xs font-mono uppercase tracking-widest text-slate-400">Country</label>
+        <Select id="trend-country-select" value={country} onChange={setCountry} options={countries} displayName={dn} />
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard size="xl" label={`${latest?.year ?? "—"} Sales`} value={latest ? fmtEvSales(latest.ev_sales) : "—"} accent="teal" isDark={isDark} />
-        <StatCard size="xl" label="Peak Year" value={peak ? String(peak.year) : "—"} accent="blue" isDark={isDark} />
-        <StatCard size="xl" label="Growth Rate (CAGR)" value={cagr ? `${cagr}%` : "—"} accent="amber" isDark={isDark} />
-        <StatCard size="xl" label={`${FORECAST_TARGET_YEAR} Forecast`} value={forecast2030 ? fmtEvSales(forecast2030.ev_sales) : "—"} accent="teal" isDark={isDark} />
+        <StatCard size="xl" label={`${latest?.year ?? "—"} Sales`} value={latest ? fmtEvSales(latest.ev_sales) : "—"} accent="teal" />
+        <StatCard size="xl" label="Peak Year" value={peak ? String(peak.year) : "—"} accent="blue" />
+        <StatCard size="xl" label="Growth Rate (CAGR)" value={cagr ? `${cagr}%` : "—"} accent="amber" />
+        <StatCard size="xl" label={`${FORECAST_TARGET_YEAR} Forecast`} value={forecast2030 ? fmtEvSales(forecast2030.ev_sales) : "—"} accent="teal" />
       </div>
 
-      <ChartLegend isDark={isDark} forecastLabel="IEA STEPS Forecast" />
+      <ChartLegend forecastLabel="IEA STEPS Forecast" />
 
       <div ref={containerRef} className="w-full" style={{ touchAction: "pan-y" }}>
         <svg ref={svgRef} className="w-full" role="img" aria-label={ariaLabel} />
       </div>
 
-      <div className={`border rounded-xl overflow-hidden ${isDark ? "border-white/10 bg-white/10" : "border-slate-200 bg-white"}`}>
+      <div className="border rounded-xl overflow-hidden border-slate-200 bg-white">
         {pinned ? (
           <div className="px-4 py-3 flex flex-col gap-1">
             <div className="flex items-center justify-between">
-              <span className={`text-xs font-mono font-bold ${isDark ? "text-white/50" : "text-slate-500"}`}>{pinned.year}</span>
-              <ForecastBadge isForecast={pinned.isForecast} isDark={isDark} />
+              <span className="text-xs font-mono font-bold text-slate-500">{pinned.year}</span>
+              <ForecastBadge isForecast={pinned.isForecast} />
             </div>
-            <p className={`text-xl font-bold mt-1 ${isDark ? "text-teal-400" : "text-teal-600"}`}>
-              {fmtEvSales(pinned.sales)} <span className={`text-sm font-normal ${isDark ? "text-white/50" : "text-slate-500"}`}>electric vehicles sold</span>
+            <p className="text-xl font-bold mt-1 text-teal-600">
+              {fmtEvSales(pinned.sales)} <span className="text-sm font-normal text-slate-500">electric vehicles sold</span>
             </p>
             {pinned.yoy !== null && (
               <p className={`text-sm font-semibold ${pinned.yoy >= 0 ? "text-green-500" : "text-red-400"}`}>
@@ -223,7 +219,7 @@ export default function EvTrendChart({ data, isDark = false }: Props) {
             )}
           </div>
         ) : (
-          <p className={`text-xs px-4 py-4 text-center ${isDark ? "text-white/30" : "text-slate-400"}`}>
+          <p className="text-xs px-4 py-4 text-center text-slate-400">
             Tap or hover the chart to explore sales by year
           </p>
         )}

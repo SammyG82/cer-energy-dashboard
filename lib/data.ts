@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-export const BASE = process.env.NODE_ENV === "production" ? "/ds3-energy-dashboard" : "";
+export const BASE = process.env.NODE_ENV === "production" ? "/cer-energy-dashboard" : "";
 
 export const TOP_5_MARKETS = ["China", "USA", "Germany", "France", "United Kingdom"];
 

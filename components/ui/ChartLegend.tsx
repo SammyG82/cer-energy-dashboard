@@ -3,14 +3,13 @@
 import { FORECAST_DASH } from "@/lib/ui-utils";
 
 interface Props {
-  isDark: boolean;
   forecastLabel?: string;
   showCI?: boolean;
 }
 
-export default function ChartLegend({ isDark, forecastLabel = "Forecast", showCI = false }: Props) {
+export default function ChartLegend({ forecastLabel = "Forecast", showCI = false }: Props) {
   return (
-    <div className={`flex justify-end text-xs ${isDark ? "text-white/40" : "text-slate-400"}`}>
+    <div className="flex justify-end text-xs text-slate-400">
       <ul role="list" className="flex items-center gap-4 list-none m-0 p-0">
         <li className="flex items-center gap-1.5">
           <span className="block w-4 h-[1.5px] rounded-full bg-current" aria-hidden="true" />

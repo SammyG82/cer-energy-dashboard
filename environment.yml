@@ -1,4 +1,4 @@
-name: ds3-energy
+name: cer-energy
 channels:
   - defaults
 dependencies:
@@ -144,4 +144,4 @@ dependencies:
       - websocket-client==1.9.0
       - widgetsnbextension==4.0.15
       - xlrd==2.0.1
-prefix: /opt/anaconda3/envs/ds3-energy
+prefix: /opt/anaconda3/envs/cer-energy

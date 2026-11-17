@@ -7,7 +7,6 @@ import StatCard from "@/components/ui/StatCard";
 import ChartCard from "@/components/ui/ChartCard";
 import { fetchEvData, fetchEvSales, fmtEvSales, dn, AGGREGATES, TOP_5_MARKETS } from "@/lib/data";
 import BehindTheNumbers from "@/components/ui/BehindTheNumbers";
-import { useTheme } from "@/lib/theme-context";
 import type { EvRow } from "@/lib/data";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import LoadingPlaceholder from "@/components/ui/LoadingPlaceholder";
@@ -19,7 +18,6 @@ const EvShareChart    = dynamic(() => import("@/components/charts/EvShareChart")
 const EvTrendChart    = dynamic(() => import("@/components/charts/EvTrendChart"),    { ssr: false, loading: ChartLoader });
 
 export default function EvForecastClient() {
-  const { isDark } = useTheme();
   const { data, error } = useDataFetch<EvRow[]>(fetchEvData, []);
   const { data: salesData, error: salesError } = useDataFetch<EvRow[]>(fetchEvSales, []);
   const [hoveredYear, setHoveredYear] = useState<number | null>(null);
@@ -57,12 +55,11 @@ export default function EvForecastClient() {
   }, [data, effectiveYear, selectedRegions]);
 
   return (
-    <div className={`transition-colors duration-300 ${isDark ? "bg-black" : "bg-white"}`}>
+    <div className="transition-colors duration-300 bg-white">
       <PageHeader
         title="EV"
         titleAccent="Forecast"
-        subtitle="Historical EV sales from 2010 across 50+ countries, with DS3 logistic S-curve projections through 2035"
-        isDark={isDark}
+        subtitle="Historical EV sales from 2010 across 50+ countries, with CER logistic S-curve projections through 2035"
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10 flex flex-col gap-10">
 
@@ -70,14 +67,13 @@ export default function EvForecastClient() {
           id="ev-sales-by-country"
           title="EV Sales Rankings"
           subtitle="Drag to see how rankings shift from 2010 to 2035. EU shown as a regional aggregate."
-          isDark={isDark}
         >
           {salesData.length > 0 ? (
-            <EvShareChart data={salesData} isDark={isDark} />
+            <EvShareChart data={salesData} />
           ) : salesError ? (
-            <ErrorMessage message={salesError} isDark={isDark} />
+            <ErrorMessage message={salesError} />
           ) : (
-            <LoadingPlaceholder text="Loading data…" isDark={isDark} />
+            <LoadingPlaceholder text="Loading data…" />
           )}
         </ChartCard>
 
@@ -85,25 +81,23 @@ export default function EvForecastClient() {
           id="ev-sales-projections"
           title="EV Sales Projections"
           subtitle="Compare projected EV growth paths across markets — hover to see values for any year"
-          delay={100}
-          isDark={isDark}
         >
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-            <StatCard label={`${isProjected ? "Projected " : ""}Global EV Sales (${effectiveYear})`} value={globalSales !== null ? fmtEvSales(globalSales) : "—"} accent="teal" isDark={isDark} />
-            <StatCard label={`${isProjected ? "Projected " : ""}YoY Growth (${effectiveYear - 1}→${effectiveYear})`} value={yoyGrowth !== null ? `${yoyGrowth >= 0 ? "+" : ""}${yoyGrowth.toFixed(1)}%` : "—"} accent="amber" isDark={isDark} />
-            <StatCard label={`${isProjected ? "Projected " : ""}Market Leader (${effectiveYear})`} value={marketLeader !== null ? dn(marketLeader) : "—"} accent="blue" isDark={isDark} />
+            <StatCard label={`${isProjected ? "Projected " : ""}Global EV Sales (${effectiveYear})`} value={globalSales !== null ? fmtEvSales(globalSales) : "—"} accent="teal" />
+            <StatCard label={`${isProjected ? "Projected " : ""}YoY Growth (${effectiveYear - 1}→${effectiveYear})`} value={yoyGrowth !== null ? `${yoyGrowth >= 0 ? "+" : ""}${yoyGrowth.toFixed(1)}%` : "—"} accent="amber" />
+            <StatCard label={`${isProjected ? "Projected " : ""}Market Leader (${effectiveYear})`} value={marketLeader !== null ? dn(marketLeader) : "—"} accent="blue" />
           </div>
           {data.length > 0 ? (
-            <EvForecastChart data={data} onYearChange={setHoveredYear} onSelectionChange={setSelectedRegions} isDark={isDark} />
+            <EvForecastChart data={data} onYearChange={setHoveredYear} onSelectionChange={setSelectedRegions} />
           ) : error ? (
-            <ErrorMessage message={error} isDark={isDark} />
+            <ErrorMessage message={error} />
           ) : (
-            <LoadingPlaceholder text="Loading data…" isDark={isDark} />
+            <LoadingPlaceholder text="Loading data…" />
           )}
-          <BehindTheNumbers isDark={isDark} className="mt-6">
-            <h4 className={`text-sm font-semibold mb-2 ${isDark ? "text-white" : "text-slate-900"}`}>Forecast Model</h4>
-            <p className={`text-sm ${isDark ? "text-white/60" : "text-slate-600"}`}>
-              DS3 logistic S-curve model fitted per country to IEA historical BEV sales data, projected through 2035 and constrained to 1.2–10× the observed peak. Historical rows are <em>Actual</em> type; projections are <em>Forecast</em> type. Solid lines show recorded sales; dashed lines show S-curve projections. Uzbekistan is excluded (fewer than 3 data points to fit).
+          <BehindTheNumbers className="mt-6">
+            <h4 className="text-sm font-semibold mb-2 text-slate-900">Forecast Model</h4>
+            <p className="text-sm text-slate-600">
+              CER logistic S-curve model fitted per country to IEA historical BEV sales data, projected through 2035 and constrained to 1.2–10× the observed peak. Historical rows are <em>Actual</em> type; projections are <em>Forecast</em> type. Solid lines show recorded sales; dashed lines show S-curve projections. Uzbekistan is excluded (fewer than 3 data points to fit).
             </p>
           </BehindTheNumbers>
         </ChartCard>
@@ -112,31 +106,29 @@ export default function EvForecastClient() {
           id="ev-sales-over-time"
           title="EV Sales Over Time"
           subtitle="Pick a country to see its EV sales history and projected growth through 2035"
-          delay={200}
-          isDark={isDark}
         >
           {salesData.length > 0 ? (
-            <EvTrendChart data={salesData} isDark={isDark} />
+            <EvTrendChart data={salesData} />
           ) : salesError ? (
-            <ErrorMessage message={salesError} isDark={isDark} />
+            <ErrorMessage message={salesError} />
           ) : (
-            <LoadingPlaceholder text="Loading data…" isDark={isDark} />
+            <LoadingPlaceholder text="Loading data…" />
           )}
-          <BehindTheNumbers isDark={isDark} className="mt-6">
+          <BehindTheNumbers className="mt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div>
-                <h4 className={`text-sm font-semibold mb-2 ${isDark ? "text-white" : "text-slate-900"}`}>Annual Growth Rate</h4>
-                <p className={`text-sm ${isDark ? "text-white/60" : "text-slate-600"}`}>
+                <h4 className="text-sm font-semibold mb-2 text-slate-900">Annual Growth Rate</h4>
+                <p className="text-sm text-slate-600">
                   Compound annual growth rate (CAGR) from the first year with recorded sales to the most recent historical year. Formula:{" "}
-                  <span className={`font-mono text-xs px-1.5 py-0.5 rounded ${isDark ? "bg-white/10 text-white/70" : "bg-slate-200"}`}>
+                  <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-slate-200">
                     ((latest ÷ first)^(1 ÷ years) − 1) × 100
                   </span>
                   . It smooths year-to-year swings, so a market that grew slowly then spiked will show a lower rate than the spike alone suggests.
                 </p>
               </div>
               <div>
-                <h4 className={`text-sm font-semibold mb-2 ${isDark ? "text-white" : "text-slate-900"}`}>Peak Year &amp; 2030 Forecast</h4>
-                <p className={`text-sm ${isDark ? "text-white/60" : "text-slate-600"}`}>
+                <h4 className="text-sm font-semibold mb-2 text-slate-900">Peak Year &amp; 2030 Forecast</h4>
+                <p className="text-sm text-slate-600">
                   Peak Year excludes projected years — it is based on actual recorded sales only. The 2030 Forecast uses IEA STEPS (Stated Policies Scenario) projections from the IEA Global EV Outlook 2025.
                 </p>
               </div>

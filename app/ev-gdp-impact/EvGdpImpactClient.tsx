@@ -3,7 +3,6 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import PageHeader from "@/components/ui/PageHeader";
-import { useTheme } from "@/lib/theme-context";
 import { fetchEvData, fetchGdpMeta, fetchOilPrices, fetchOilForecast, fetchNetTrade, fetchOilExports } from "@/lib/data";
 import type { EvRow, GdpMeta, OilPriceRow, OilRow } from "@/lib/data";
 import type { PresetItem } from "@/components/ui/RegionPicker";
@@ -11,7 +10,6 @@ import { OIL_IMPORT_PRESETS } from "@/lib/oil-presets";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import LoadingPlaceholder from "@/components/ui/LoadingPlaceholder";
-import FadeIn from "@/components/ui/FadeIn";
 import BehindTheNumbers from "@/components/ui/BehindTheNumbers";
 import { useDataFetch, useHashScroll, useOilForecastBoundary } from "@/lib/ui-utils";
 import ChartLoader from "@/components/ui/ChartLoader";
@@ -90,8 +88,6 @@ const DATASETS: { id: Dataset; label: string; description: string; chartLabel: "
 ];
 
 export default function EvGdpImpactClient() {
-  const { isDark } = useTheme();
-
   const { data: evData,      error: evDataError }    = useDataFetch<EvRow[]>(fetchEvData, []);
   const { data: gdpMeta,     error: gdpMetaError }   = useDataFetch<GdpMeta[]>(fetchGdpMeta, []);
   const { data: oilPrices,   error: oilPricesError } = useDataFetch<OilPriceRow[]>(fetchOilPrices, []);
@@ -120,89 +116,82 @@ export default function EvGdpImpactClient() {
   const sharedStatYear = isFinite(oilForecastBoundary) ? oilForecastBoundary - 1 : 2023;
 
   return (
-    <div className={`transition-colors duration-300 ${isDark ? "bg-black" : "bg-white"}`}>
+    <div className="transition-colors duration-300 bg-white">
       <PageHeader
         title="EV"
         titleAccent="Impact"
         subtitle="Model how EV adoption reduces oil import spending — and what those savings represent as a share of GDP"
-        isDark={isDark}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-10 flex flex-col gap-6">
 
         {/* GDP Impact chart */}
-        <FadeIn>
-          <section id="ev-gdp-section" className="scroll-mt-24" aria-label="GDP Impact">
-            {evReady ? (
-              <ErrorBoundary>
-                <EvGdpImpactCharts evData={evData} gdpMeta={gdpMeta} oilPrices={oilPrices} oilPricesError={oilPricesError} isDark={isDark} />
-              </ErrorBoundary>
-            ) : anyEvError ? (
-              <div className={`rounded-2xl p-6 border flex flex-col gap-2 ${isDark ? "bg-white/5 border-white/10" : "bg-white border-slate-200"}`}>
-                {evDataError  && <ErrorMessage message={evDataError}  isDark={isDark} />}
-                {gdpMetaError && <ErrorMessage message={gdpMetaError} isDark={isDark} />}
-              </div>
-            ) : (
-              <div className={`rounded-2xl p-6 border min-h-[300px] sm:min-h-[500px] ${isDark ? "bg-white/5 border-white/10" : "bg-white border-slate-200"}`}>
-                <LoadingPlaceholder text="Loading data…" isDark={isDark} />
-              </div>
-            )}
-          </section>
-        </FadeIn>
+        <section id="ev-gdp-section" className="scroll-mt-24" aria-label="GDP Impact">
+          {evReady ? (
+            <ErrorBoundary>
+              <EvGdpImpactCharts evData={evData} gdpMeta={gdpMeta} oilPrices={oilPrices} oilPricesError={oilPricesError} />
+            </ErrorBoundary>
+          ) : anyEvError ? (
+            <div className="rounded-2xl p-6 border flex flex-col gap-2 bg-white border-slate-200">
+              {evDataError  && <ErrorMessage message={evDataError} />}
+              {gdpMetaError && <ErrorMessage message={gdpMetaError} />}
+            </div>
+          ) : (
+            <div className="rounded-2xl p-6 border min-h-[300px] sm:min-h-[500px] bg-white border-slate-200">
+              <LoadingPlaceholder text="Loading data…" />
+            </div>
+          )}
+        </section>
 
         {/* Oil Explorer chart */}
-        <FadeIn delay={100}>
-          <section id="oil-import-forecasts" className={`rounded-2xl p-4 sm:p-6 flex flex-col gap-6 scroll-mt-24 border ${isDark ? "bg-white/5 border-white/10" : "bg-white border-slate-200"}`} aria-labelledby="oil-explorer-heading">
+        <section id="oil-import-forecasts" className="rounded-2xl p-4 sm:p-6 flex flex-col gap-6 scroll-mt-24 border bg-white border-slate-200" aria-labelledby="oil-explorer-heading">
 
-            <div>
-              <h2 id="oil-explorer-heading" className={`text-xl font-bold mb-1 ${isDark ? "text-white" : "text-slate-900"}`}>Oil Explorer</h2>
-              <p className={`text-sm ${isDark ? "text-white/50" : "text-slate-500"}`}>Recorded oil trade volumes through 2023, with modeled forecasts and uncertainty bands through 2030</p>
+          <div>
+            <h2 id="oil-explorer-heading" className="text-xl font-bold mb-1 text-slate-900">Oil Explorer</h2>
+            <p className="text-sm text-slate-500">Recorded oil trade volumes through 2023, with modeled forecasts and uncertainty bands through 2030</p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <p id="oil-dataset-label" className="text-xs font-mono uppercase tracking-widest text-slate-400">Dataset</p>
+            <div className="flex gap-2 flex-wrap" role="group" aria-labelledby="oil-dataset-label">
+              {DATASETS.map((d) => (
+                <button
+                  type="button"
+                  key={d.id}
+                  onClick={() => setDataset(d.id)}
+                  aria-pressed={dataset === d.id}
+                  className={`text-sm font-semibold px-4 py-3 rounded-xl border transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 ${
+                    dataset === d.id
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"
+                  }`}
+                >
+                  {d.label}
+                </button>
+              ))}
             </div>
+            <p className="text-xs text-slate-400">{activeMeta.description}</p>
+          </div>
 
-            <div className="flex flex-col gap-2">
-              <p id="oil-dataset-label" className={`text-xs font-mono uppercase tracking-widest ${isDark ? "text-white/40" : "text-slate-400"}`}>Dataset</p>
-              <div className="flex gap-2 flex-wrap" role="group" aria-labelledby="oil-dataset-label">
-                {DATASETS.map((d) => (
-                  <button
-                    type="button"
-                    key={d.id}
-                    onClick={() => setDataset(d.id)}
-                    aria-pressed={dataset === d.id}
-                    className={`text-sm font-semibold px-4 py-3 rounded-xl border transition-colors focus:outline-none focus:ring-2 ${isDark ? "focus:ring-white" : "focus:ring-slate-500"} ${
-                      dataset === d.id
-                        ? isDark ? "bg-white text-black border-white" : "bg-slate-900 text-white border-slate-900"
-                        : isDark
-                        ? "bg-white/10 text-white/70 border-white/10 hover:border-white/30"
-                        : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"
-                    }`}
-                  >
-                    {d.label}
-                  </button>
-                ))}
-              </div>
-              <p className={`text-xs ${isDark ? "text-white/40" : "text-slate-400"}`}>{activeMeta.description}</p>
-            </div>
+          <div className="rounded-2xl p-4 sm:p-6 border bg-white border-slate-200 shadow-sm">
+            {active.length > 0 ? (
+              <ErrorBoundary>
+                <OilForecastChart key={dataset} data={active} datasetLabel={activeMeta.chartLabel} chartPresets={DATASET_PRESETS[dataset]} statYear={sharedStatYear} />
+              </ErrorBoundary>
+            ) : activeError ? (
+              <ErrorMessage message={activeError} />
+            ) : (
+              <LoadingPlaceholder text="Loading data…" />
+            )}
+          </div>
 
-            <div className={`rounded-2xl p-4 sm:p-6 border ${isDark ? "bg-white/10 border-white/10" : "bg-white border-slate-200 shadow-sm"}`}>
-              {active.length > 0 ? (
-                <ErrorBoundary>
-                  <OilForecastChart key={dataset} data={active} datasetLabel={activeMeta.chartLabel} chartPresets={DATASET_PRESETS[dataset]} statYear={sharedStatYear} isDark={isDark} />
-                </ErrorBoundary>
-              ) : activeError ? (
-                <ErrorMessage message={activeError} isDark={isDark} />
-              ) : (
-                <LoadingPlaceholder text="Loading data…" isDark={isDark} />
-              )}
-            </div>
+          <BehindTheNumbers>
+            <h4 className="text-sm font-semibold mb-2 text-slate-900">Log-ARIMA forecast</h4>
+            <p className="text-sm text-black/70">
+              Forecasts are produced by a Log-ARIMA model fitted separately for each country. The model parameters (p, d, q) are selected by minimising AIC across a grid search. The shaded band around each forecast line is a 95% confidence interval — wider bands mean the model is less certain about that country&apos;s trajectory. Bands are capped at ±150% of the point forecast to keep the chart readable; for volatile series the true statistical interval may extend further.
+            </p>
+          </BehindTheNumbers>
 
-            <BehindTheNumbers isDark={isDark}>
-              <h4 className={`text-sm font-semibold mb-2 ${isDark ? "text-white" : "text-slate-900"}`}>Log-ARIMA forecast</h4>
-              <p className={`text-sm ${isDark ? "text-white/70" : "text-black/70"}`}>
-                Forecasts are produced by a Log-ARIMA model fitted separately for each country. The model parameters (p, d, q) are selected by minimising AIC across a grid search. The shaded band around each forecast line is a 95% confidence interval — wider bands mean the model is less certain about that country&apos;s trajectory. Bands are capped at ±150% of the point forecast to keep the chart readable; for volatile series the true statistical interval may extend further.
-              </p>
-            </BehindTheNumbers>
-
-          </section>
-        </FadeIn>
+        </section>
 
       </div>
     </div>

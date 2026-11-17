@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import * as d3 from "d3";
 import type { EvRow, GdpMeta, OilPriceRow } from "@/lib/data";
 import { fmtEvSales } from "@/lib/data";
-import { useContainerSize, useThemeRef, useChartTheme, drawCrosshair, drawHorizontalGridLines, drawTickDot, useEvForecastBoundary } from "@/lib/ui-utils";
+import { useContainerSize, drawCrosshair, drawHorizontalGridLines, drawTickDot, useEvForecastBoundary } from "@/lib/ui-utils";
 import StatCard from "@/components/ui/StatCard";
 import Select from "@/components/ui/Select";
 import BehindTheNumbers from "@/components/ui/BehindTheNumbers";
@@ -16,7 +16,6 @@ interface Props {
   gdpMeta: GdpMeta[];
   oilPrices: OilPriceRow[];
   oilPricesError?: string | null;
-  isDark?: boolean;
 }
 
 const GALLONS_PER_EV = 1300;
@@ -36,12 +35,11 @@ function compute(evRegion: string, year: number, adoption: number, meta: GdpMeta
 
 type Benchmark = "brent" | "wti";
 
-export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPricesError, isDark = false }: Props) {
+export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPricesError }: Props) {
   const priceSvg = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { width: containerWidth } = useContainerSize(containerRef);
   const priceInitialisedRef = useRef(false);
-  const isDarkRef = useThemeRef(isDark);
 
   const countries = useMemo(() => gdpMeta.map((m) => m.country), [gdpMeta]);
   const forecastBoundary = useEvForecastBoundary(evData);
@@ -158,7 +156,7 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
     const allVals = chartData.flatMap((d) => [d.brent_nominal, d.wti_nominal, d.brent_real, d.wti_real]).filter((v): v is number => v !== null);
     const y = d3.scaleLinear().domain([0, d3.max(allVals) ?? 100]).nice().range([height, 0]);
 
-    drawHorizontalGridLines(g, y, width, 4, isDarkRef.current);
+    drawHorizontalGridLines(g, y, width, 4);
 
     type NomKey  = "brent_nominal" | "wti_nominal";
     type RealKey = "brent_real"    | "wti_real";
@@ -218,7 +216,7 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
       tickYears.forEach((yr) => {
         const row = tickByYear.get(yr);
         if (!row || row[nomKey] === null) return;
-        drawTickDot(g, x(yr), y(row[nomKey] as number), color, isDarkRef, `oil-tick-${label}`, active ? 1 : 0.3);
+        drawTickDot(g, x(yr), y(row[nomKey] as number), color, `oil-tick-${label}`, active ? 1 : 0.3);
       });
     }
 
@@ -227,7 +225,7 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
     g.append("g").attr("class", "chart-axis")
       .call(d3.axisLeft(y).ticks(4).tickFormat((d) => `$${+d}`));
 
-    const crosshair = drawCrosshair(g, height, isDarkRef);
+    const crosshair = drawCrosshair(g, height);
 
     g.append("rect")
       .attr("width", width).attr("height", height)
@@ -257,52 +255,49 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
     }
   }, [benchmark]);
 
-  useChartTheme(priceSvg, isDark);
-
-
   return (
-    <div ref={containerRef} className={`border rounded-2xl p-4 sm:p-6 flex flex-col gap-6 transition-colors ${isDark ? "bg-black border-white/10" : "bg-white border-slate-200"}`}>
+    <div ref={containerRef} className="border rounded-2xl p-4 sm:p-6 flex flex-col gap-6 transition-colors bg-white border-slate-200">
 
       {/* Title */}
       <div>
-        <h2 className={`text-xl font-bold mb-1 ${isDark ? "text-white" : "text-slate-900"}`}>GDP Impact</h2>
-        <p className={`text-sm ${isDark ? "text-white/50" : "text-slate-500"}`}>How EV adoption displaces oil spending as a share of each country&apos;s economy.</p>
+        <h2 className="text-xl font-bold mb-1 text-slate-900">GDP Impact</h2>
+        <p className="text-sm text-slate-500">How EV adoption displaces oil spending as a share of each country&apos;s economy.</p>
       </div>
 
       {/* Controls */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
         <div>
           <div className="flex justify-between mb-1">
-            <label htmlFor="ev-adoption-rate" className={`text-xs font-mono uppercase tracking-widest ${isDark ? "text-white/40" : "text-slate-400"}`}>EV Adoption Rate</label>
-            <span className={`text-sm font-mono font-bold ${isDark ? "text-teal-400" : "text-teal-600"}`}>{adoption.toFixed(1)}x</span>
+            <label htmlFor="ev-adoption-rate" className="text-xs font-mono uppercase tracking-widest text-slate-400">EV Adoption Rate</label>
+            <span className="text-sm font-mono font-bold text-teal-600">{adoption.toFixed(1)}x</span>
           </div>
           <input id="ev-adoption-rate" type="range" min="0.5" max="3" step="0.1" value={adoption}
             aria-label="EV Adoption Rate multiplier"
             onChange={(e) => setAdoption(parseFloat(e.target.value))}
             className="w-full focus:outline-none focus:ring-2 focus:ring-slate-500" />
-          <p className={`text-xs mt-1 ${isDark ? "text-white/50" : "text-slate-400"}`}>0.5x = slower growth · 2x = double the projected rate</p>
+          <p className="text-xs mt-1 text-slate-400">0.5x = slower growth · 2x = double the projected rate</p>
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="gdp-country-select" className={`text-xs font-mono uppercase tracking-widest ${isDark ? "text-white/40" : "text-slate-400"}`}>Country</label>
-          <Select id="gdp-country-select" value={country} onChange={setCountry} options={countries} fullWidth isDark={isDark} />
+          <label htmlFor="gdp-country-select" className="text-xs font-mono uppercase tracking-widest text-slate-400">Country</label>
+          <Select id="gdp-country-select" value={country} onChange={setCountry} options={countries} fullWidth />
         </div>
 
         <div>
           <div className="flex justify-between mb-1">
-            <label htmlFor="analysis-year" className={`text-xs font-mono uppercase tracking-widest ${isDark ? "text-white/40" : "text-slate-400"}`}>Analysis Year</label>
-            <span className={`text-sm font-mono font-bold ${isDark ? "text-teal-400" : "text-teal-600"}`}>{year}</span>
+            <label htmlFor="analysis-year" className="text-xs font-mono uppercase tracking-widest text-slate-400">Analysis Year</label>
+            <span className="text-sm font-mono font-bold text-teal-600">{year}</span>
           </div>
           <input id="analysis-year" type="range"
             min={years[0] ?? year} max={years[years.length - 1] ?? year}
             step="1" value={year} aria-label="Analysis Year"
             onChange={(e) => setYear(parseInt(e.target.value))}
             className="w-full focus:outline-none focus:ring-2 focus:ring-slate-500" />
-          {years.length > 0 && <p className={`text-xs mt-1 ${isDark ? "text-white/50" : "text-slate-400"}`}>Select {years[0]} – {years[years.length - 1]}</p>}
+          {years.length > 0 && <p className="text-xs mt-1 text-slate-400">Select {years[0]} – {years[years.length - 1]}</p>}
         </div>
 
         <div className="flex flex-col gap-2">
-          <span id="price-benchmark-label" className={`text-xs font-mono uppercase tracking-widest ${isDark ? "text-white/40" : "text-slate-400"}`}>Price Benchmark</span>
+          <span id="price-benchmark-label" className="text-xs font-mono uppercase tracking-widest text-slate-400">Price Benchmark</span>
           <div role="group" aria-labelledby="price-benchmark-label" className="flex gap-2">
             {(["brent", "wti"] as Benchmark[]).map((b) => (
               <button key={b} type="button" onClick={() => setBenchmark(b)}
@@ -310,8 +305,6 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
                 className={`flex-1 text-xs font-mono py-2 rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 ${
                   benchmark === b
                     ? "bg-teal-600 text-white border-teal-600"
-                    : isDark
-                    ? "bg-white/10 text-white/50 border-white/10 hover:border-teal-400/50"
                     : "bg-white text-slate-500 border-slate-200 hover:border-teal-300"
                 }`}>
                 {b === "brent" ? "Brent" : "WTI"}
@@ -323,15 +316,15 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
 
       {/* Stat cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard size="xl" isDark={isDark} nested={false} label={`${isProjected ? "Projected " : ""}EV Sales`}    value={fmtEvSales(sales)}                                                          sub={`${country} ${year}`} accent="teal" />
-        <StatCard size="xl" isDark={isDark} nested={false} label={`${isProjected ? "Projected " : ""}Oil Saved`}   value={oilDisplaced === 0 ? "0" : oilDisplaced >= 1 ? `${oilDisplaced.toFixed(0)}M` : oilDisplaced >= 0.1 ? `${oilDisplaced.toFixed(1)}M` : `${(oilDisplaced * 1000).toFixed(0)}k`} sub="barrels per year"    accent="amber" />
-        <StatCard size="xl" isDark={isDark} nested={false} label={`${isProjected ? "Projected " : ""}Cost Saved`}  value={!oilPrices.length && !beyondData ? "—" : `$${costSavings.toFixed(1)}B`}  sub="annually"             accent="blue" />
-        <StatCard size="xl" isDark={isDark} nested={false} label={`${isProjected ? "Projected " : ""}GDP Savings`} value={!oilPrices.length && !beyondData ? "—" : `${gdpPercent.toFixed(3)}%`}   sub="of GDP"               accent="teal" />
+        <StatCard size="xl" label={`${isProjected ? "Projected " : ""}EV Sales`}    value={fmtEvSales(sales)}                                                          sub={`${country} ${year}`} accent="teal" />
+        <StatCard size="xl" label={`${isProjected ? "Projected " : ""}Oil Saved`}   value={oilDisplaced === 0 ? "0" : oilDisplaced >= 1 ? `${oilDisplaced.toFixed(0)}M` : oilDisplaced >= 0.1 ? `${oilDisplaced.toFixed(1)}M` : `${(oilDisplaced * 1000).toFixed(0)}k`} sub="barrels per year"    accent="amber" />
+        <StatCard size="xl" label={`${isProjected ? "Projected " : ""}Cost Saved`}  value={!oilPrices.length && !beyondData ? "—" : `$${costSavings.toFixed(1)}B`}  sub="annually"             accent="blue" />
+        <StatCard size="xl" label={`${isProjected ? "Projected " : ""}GDP Savings`} value={!oilPrices.length && !beyondData ? "—" : `${gdpPercent.toFixed(3)}%`}   sub="of GDP"               accent="teal" />
       </div>
 
       {/* Oil price stat + scenario slider */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <StatCard size="xl" isDark={isDark} nested={false}
+        <StatCard size="xl"
           label={`${benchmark === "brent" ? "Brent" : "WTI"} Crude${beyondData || !oilPrices.length ? "" : ` (${priceDisplayYear} avg)`}`}
           value={`$${currentOilPrice.toFixed(2)}/bbl`}
           sub={beyondData ? "custom scenario assumption" : !oilPrices.length ? "estimate — data unavailable" : "nominal USD · EIA"}
@@ -339,20 +332,20 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
 
         <div className={`border rounded-xl p-4 flex flex-col justify-between transition-opacity ${
           beyondData
-            ? isDark ? "bg-white/5 border-amber-400/30" : "bg-white border-amber-200"
-            : isDark ? "bg-white/5 border-white/10 opacity-40 pointer-events-none select-none" : "bg-white border-slate-200 opacity-40 pointer-events-none select-none"
+            ? "bg-white border-amber-200"
+            : "bg-white border-slate-200 opacity-40 pointer-events-none select-none"
         }`}>
           <div className="flex justify-between items-start mb-3">
             <div>
-              <label htmlFor="custom-oil-price" className={`text-xs font-mono uppercase tracking-widest mb-0.5 block ${beyondData ? isDark ? "text-amber-400" : "text-amber-700" : isDark ? "text-white/50" : "text-slate-400"}`}>{benchmark === "brent" ? "Brent" : "WTI"} Price Assumption</label>
-              <p className={`text-xs ${isDark ? "text-white/50" : "text-slate-400"}`}>
+              <label htmlFor="custom-oil-price" className={`text-xs font-mono uppercase tracking-widest mb-0.5 block ${beyondData ? "text-amber-700" : "text-slate-400"}`}>{benchmark === "brent" ? "Brent" : "WTI"} Price Assumption</label>
+              <p className="text-xs text-slate-400">
                 {beyondData ? `No oil price data beyond ${latestDataYear} — set your own` : `Unlocks for years after ${latestDataYear}`}
               </p>
               {beyondData && (
-                <p className={`text-xs mt-0.5 ${isDark ? "text-white/50" : "text-slate-400"}`}>Due to political factors, oil prices are hard to predict.</p>
+                <p className="text-xs mt-0.5 text-slate-400">Due to political factors, oil prices are hard to predict.</p>
               )}
             </div>
-            <span className={`text-xl font-bold tabular-nums ${beyondData ? isDark ? "text-amber-400" : "text-amber-600" : isDark ? "text-white/20" : "text-slate-400"}`}>
+            <span className={`text-xl font-bold tabular-nums ${beyondData ? "text-amber-600" : "text-slate-400"}`}>
               ${beyondData ? customPrice.toFixed(0) : "—"}/bbl
             </span>
           </div>
@@ -363,21 +356,21 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
             onChange={(e) => setCustomPrice(Math.max(40, Math.min(150, parseFloat(e.target.value))))}
             className="w-full range-amber focus:outline-none focus:ring-2 focus:ring-slate-500" />
           <div className="flex justify-between mt-1">
-            <span className={`text-xs font-mono ${isDark ? "text-white/50" : "text-slate-400"}`}>$40</span>
-            <span className={`text-xs font-mono ${isDark ? "text-white/50" : "text-slate-400"}`}>$150</span>
+            <span className="text-xs font-mono text-slate-400">$40</span>
+            <span className="text-xs font-mono text-slate-400">$150</span>
           </div>
         </div>
       </div>
 
       {/* Historical oil price chart */}
-      <div className={`border rounded-xl p-4 transition-colors ${isDark ? "bg-white/5 border-white/10" : "bg-white border-slate-200"}`}>
+      <div className="border rounded-xl p-4 transition-colors bg-white border-slate-200">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div>
-            <p className={`text-sm font-bold ${isDark ? "text-white" : "text-slate-800"}`}>
+            <p className="text-sm font-bold text-slate-800">
               Historical Crude Oil Prices ({oilPrices[0]?.year ?? 1986}–{oilPrices.at(-1)?.year ?? "present"})
             </p>
           </div>
-          <div className={`flex items-center gap-4 text-xs font-mono pt-1 ${isDark ? "text-white/40" : "text-slate-500"}`}>
+          <div className="flex items-center gap-4 text-xs font-mono pt-1 text-slate-500">
             <span className="flex items-center gap-1.5">
               <svg width="20" height="8" aria-hidden="true"><line x1="0" y1="4" x2="20" y2="4" stroke="#d97706" strokeWidth={benchmark === "brent" ? 2.5 : 1.5} opacity={benchmark === "brent" ? 1 : 0.4} /></svg>
               Brent
@@ -394,30 +387,30 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
         </div>
         {!oilPrices.length
           ? oilPricesError
-            ? <ErrorMessage message={oilPricesError} isDark={isDark} />
-            : <LoadingPlaceholder text="Loading oil prices…" isDark={isDark} />
+            ? <ErrorMessage message={oilPricesError} />
+            : <LoadingPlaceholder text="Loading oil prices…" />
           : <div style={{ touchAction: "pan-y" }}><svg ref={priceSvg} className="w-full" role="img" aria-label={priceSvgLabel} /></div>
         }
-        <div className={`border rounded-lg px-3 py-2 min-h-10 flex items-center mt-2 ${isDark ? "border-white/10 bg-white/10" : "border-slate-100 bg-slate-50"}`}>
+        <div className="border rounded-lg px-3 py-2 min-h-10 flex items-center mt-2 border-slate-100 bg-slate-50">
           {pinnedPriceRow ? (
-            <span className={`text-xs flex flex-wrap gap-x-6 gap-y-1 ${isDark ? "text-white/70" : "text-slate-700"}`}>
-              <span className={`font-mono font-bold ${isDark ? "text-white" : ""}`}>{pinnedPriceRow.year}</span>
-              <span><span className={`font-semibold ${isDark ? "text-amber-400" : "text-amber-700"}`}>Brent</span> {pinnedPriceRow.brent_nominal != null ? `$${pinnedPriceRow.brent_nominal.toFixed(2)}` : "—"} nominal · {pinnedPriceRow.brent_real != null ? `$${pinnedPriceRow.brent_real.toFixed(2)}` : "—"} real</span>
-              <span><span className={`font-semibold ${isDark ? "text-cyan-400" : "text-cyan-700"}`}>WTI</span> {pinnedPriceRow.wti_nominal != null ? `$${pinnedPriceRow.wti_nominal.toFixed(2)}` : "—"} nominal · {pinnedPriceRow.wti_real != null ? `$${pinnedPriceRow.wti_real.toFixed(2)}` : "—"} real</span>
+            <span className="text-xs flex flex-wrap gap-x-6 gap-y-1 text-slate-700">
+              <span className="font-mono font-bold">{pinnedPriceRow.year}</span>
+              <span><span className="font-semibold text-amber-700">Brent</span> {pinnedPriceRow.brent_nominal != null ? `$${pinnedPriceRow.brent_nominal.toFixed(2)}` : "—"} nominal · {pinnedPriceRow.brent_real != null ? `$${pinnedPriceRow.brent_real.toFixed(2)}` : "—"} real</span>
+              <span><span className="font-semibold text-cyan-700">WTI</span> {pinnedPriceRow.wti_nominal != null ? `$${pinnedPriceRow.wti_nominal.toFixed(2)}` : "—"} nominal · {pinnedPriceRow.wti_real != null ? `$${pinnedPriceRow.wti_real.toFixed(2)}` : "—"} real</span>
             </span>
           ) : (
-            <span className={`text-xs ${isDark ? "text-white/50" : "text-slate-400"}`}>Tap or hover the chart to see prices by year</span>
+            <span className="text-xs text-slate-400">Tap or hover the chart to see prices by year</span>
           )}
         </div>
       </div>
 
       {/* Behind the Numbers */}
-      <BehindTheNumbers isDark={isDark}>
+      <BehindTheNumbers>
         <div className="space-y-4">
           {[
             {
               title: "Oil displacement",
-              body: (<>Each EV is assumed to displace approximately 1,300 gallons of fuel per year — a mid-range estimate for a typical internal combustion vehicle. At 42 gallons per barrel, the total oil displaced is{" "}<span className={`font-mono text-xs px-1.5 py-0.5 rounded ${isDark ? "bg-white/10" : "bg-black/5"}`}>(EVs × 1,300) ÷ 42 ÷ 1,000,000</span>{" "}million barrels per year. This is an indicative estimate, not a measured figure.</>),
+              body: (<>Each EV is assumed to displace approximately 1,300 gallons of fuel per year — a mid-range estimate for a typical internal combustion vehicle. At 42 gallons per barrel, the total oil displaced is{" "}<span className="font-mono text-xs px-1.5 py-0.5 rounded bg-black/5">(EVs × 1,300) ÷ 42 ÷ 1,000,000</span>{" "}million barrels per year. This is an indicative estimate, not a measured figure.</>),
             },
             {
               title: "Cost savings & GDP %",
@@ -425,7 +418,7 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
             },
             {
               title: "Adoption rate slider",
-              body: "EV sales figures come from DS3's logistic S-curve model, fitted per country to IEA historical BEV sales data and projected through 2035. The slider scales those figures by the selected multiplier — at 1× it uses the model projection directly, at 0.5× it assumes half of projected EVs are actually adopted.",
+              body: "EV sales figures come from CER's logistic S-curve model, fitted per country to IEA historical BEV sales data and projected through 2035. The slider scales those figures by the selected multiplier — at 1× it uses the model projection directly, at 0.5× it assumes half of projected EVs are actually adopted.",
             },
             {
               title: "Caveats",
@@ -433,12 +426,12 @@ export default function EvGdpImpactCharts({ evData, gdpMeta, oilPrices, oilPrice
             },
             {
               title: "Historical oil prices & inflation adjustment",
-              body: (<>Brent and WTI spot prices come from EIA, averaged to annual figures. The dashed line and shaded area show inflation-adjusted prices in real 2024 USD, using the US Consumer Price Index (BLS CPI-U) from 1986 to 2026. The deflation formula is{" "}<span className={`font-mono text-xs px-1.5 py-0.5 rounded ${isDark ? "bg-white/10" : "bg-black/5"}`}>real = nominal × (CPI₂₀₂₄ ÷ CPI_year)</span>{" "}— so a $97 barrel in 2008 becomes ~$141 in today&apos;s dollars. The shaded gap between the lines represents purchasing power lost to inflation.</>),
+              body: (<>Brent and WTI spot prices come from EIA, averaged to annual figures. The dashed line and shaded area show inflation-adjusted prices in real 2024 USD, using the US Consumer Price Index (BLS CPI-U) from 1986 to 2026. The deflation formula is{" "}<span className="font-mono text-xs px-1.5 py-0.5 rounded bg-black/5">real = nominal × (CPI₂₀₂₄ ÷ CPI_year)</span>{" "}— so a $97 barrel in 2008 becomes ~$141 in today&apos;s dollars. The shaded gap between the lines represents purchasing power lost to inflation.</>),
             },
           ].map(({ title, body }) => (
             <div key={title}>
-              <h4 className={`text-sm font-medium mb-2 ${isDark ? "text-white" : "text-black"}`}>{title}</h4>
-              <p className={`text-sm ${isDark ? "text-white/60" : "text-black/70"}`}>{body}</p>
+              <h4 className="text-sm font-medium mb-2 text-black">{title}</h4>
+              <p className="text-sm text-black/70">{body}</p>
             </div>
           ))}
         </div>

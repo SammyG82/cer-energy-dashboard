@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import * as d3 from "d3";
 import type { EvRow } from "@/lib/data";
 import { EV_DISPLAY_NAMES, fmtEvSales, COUNTRY_COLORS, dn, TOP_5_MARKETS } from "@/lib/data";
-import { tooltipStyle, useContainerSize, toggleSelection, drawHorizontalGridLines, drawForecastBoundary, useThemeRef, useChartTheme, drawCrosshair, drawTickDot, useEvForecastBoundary, FORECAST_DASH } from "@/lib/ui-utils";
+import { tooltipStyle, useContainerSize, toggleSelection, drawHorizontalGridLines, drawForecastBoundary, drawCrosshair, drawTickDot, useEvForecastBoundary, FORECAST_DASH } from "@/lib/ui-utils";
 import RegionPicker from "@/components/ui/RegionPicker";
 import ChartLegend from "@/components/ui/ChartLegend";
 import PreviewTooltip from "@/components/ui/PreviewTooltip";
@@ -13,7 +13,6 @@ import PinnedPanel from "@/components/ui/PinnedPanel";
 interface Props {
   data: EvRow[];
   preview?: boolean;
-  isDark?: boolean;
   onYearChange?: (year: number | null) => void;
   onSelectionChange?: (regions: string[]) => void;
 }
@@ -24,7 +23,7 @@ interface PinnedState {
 }
 
 
-export default function EvForecastChart({ data, preview = false, isDark = false, onYearChange, onSelectionChange }: Props) {
+export default function EvForecastChart({ data, preview = false, onYearChange, onSelectionChange }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const onYearChangeRef = useRef(onYearChange);
@@ -33,7 +32,6 @@ export default function EvForecastChart({ data, preview = false, isDark = false,
   const onSelectionChangeRef = useRef(onSelectionChange);
   useEffect(() => { onSelectionChangeRef.current = onSelectionChange; }, [onSelectionChange]);
   const { width: containerWidth, height: containerHeight } = useContainerSize(containerRef);
-  const isDarkRef = useThemeRef(isDark);
   const [pinned, setPinned] = useState<PinnedState | null>(null);
   const [previewTooltip, setPreviewTooltip] = useState<PinnedState | null>(null);
   const [previewTooltipPos, setPreviewTooltipPos] = useState<{ x: number; y: number } | null>(null);
@@ -126,10 +124,10 @@ export default function EvForecastChart({ data, preview = false, isDark = false,
       .nice()
       .range([height, 0]);
 
-    drawHorizontalGridLines(g, y, width, 5, isDarkRef.current);
+    drawHorizontalGridLines(g, y, width, 5);
 
     if (isFinite(forecastBoundary)) {
-      drawForecastBoundary(g, x, forecastBoundary, height, isDarkRef.current);
+      drawForecastBoundary(g, x, forecastBoundary, height);
     }
 
     const line = d3.line<EvRow>()
@@ -160,7 +158,7 @@ export default function EvForecastChart({ data, preview = false, isDark = false,
       tickYears.forEach((yr) => {
         const row = byYr.get(yr);
         if (!row) return;
-        drawTickDot(g, x(yr), y(row.ev_sales), color, isDarkRef);
+        drawTickDot(g, x(yr), y(row.ev_sales), color);
       });
     });
 
@@ -170,7 +168,7 @@ export default function EvForecastChart({ data, preview = false, isDark = false,
     g.append("g").attr("class", "chart-axis")
       .call(d3.axisLeft(y).tickFormat((v) => fmtEvSales(+v)).ticks(5));
 
-    const crosshair = drawCrosshair(g, height, isDarkRef);
+    const crosshair = drawCrosshair(g, height);
 
     let lastPinnedYear: number | null = null;
     const yearEntryMap = new Map<number, { region: string; value: number; color: string }[]>();
@@ -231,8 +229,6 @@ export default function EvForecastChart({ data, preview = false, isDark = false,
       });
   }, [regionData, data, preview, colorMap, forecastBoundary, containerWidth]);
 
-  useChartTheme(svgRef, isDark);
-
   return (
     <div className="flex flex-col gap-4">
       {!preview && (
@@ -252,12 +248,11 @@ export default function EvForecastChart({ data, preview = false, isDark = false,
             }}
             colorMap={colorMap}
             displayNames={EV_DISPLAY_NAMES}
-            isDark={isDark}
           />
         </div>
       )}
 
-      <ChartLegend isDark={isDark} forecastLabel="DS3 S-curve Forecast" />
+      <ChartLegend forecastLabel="CER S-curve Forecast" />
 
       <div ref={containerRef} className="w-full relative" style={{ touchAction: "pan-y" }}>
         <svg ref={svgRef} className="w-full" role="img" aria-label={ariaLabel} />
@@ -271,7 +266,6 @@ export default function EvForecastChart({ data, preview = false, isDark = false,
               value: fmtEvSales(value),
               color,
             }))}
-            isDark={isDark}
             style={tooltipStyle(previewTooltipPos.x, previewTooltipPos.y, containerWidth, containerHeight, 150, 240)}
           />
         )}
@@ -279,7 +273,6 @@ export default function EvForecastChart({ data, preview = false, isDark = false,
 
       {!preview && (
         <PinnedPanel
-          isDark={isDark}
           emptyText="Tap or hover the chart to explore values by year"
           data={pinned ? {
             year: pinned.year,

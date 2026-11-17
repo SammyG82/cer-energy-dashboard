@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@variant dark (&:where(.dark, .dark *));
 
 html.page-loading main {
   opacity: 0;
@@ -19,17 +18,6 @@ html.page-loading main {
   stroke: #e2e8f0;
   stroke-dasharray: 3;
   opacity: 0.6;
-}
-
-html.dark .chart-axis line,
-html.dark .chart-axis path {
-  stroke: #334155;
-}
-html.dark .chart-axis text {
-  fill: #94a3b8;
-}
-html.dark .chart-grid-line {
-  stroke: #334155;
 }
 
 /* ── Range input cross-browser normalization ─────────────────────────────── */
@@ -90,9 +78,6 @@ input[type="range"].range-amber::-moz-range-thumb    { background: #f59e0b; }
   }
 }
 
-html.dark input[type="range"]::-webkit-slider-runnable-track { background: #1e293b; /* slate-800 */ }
-html.dark input[type="range"]::-moz-range-track              { background: #1e293b; }
-
 /* ── Checkbox cross-browser normalization ───────────────────────────────── */
 input[type="checkbox"] {
   -webkit-appearance: none;
@@ -125,6 +110,3 @@ input[type="checkbox"]:checked::after {
   border-left: none;
   transform: rotate(45deg);
 }
-
-html.dark input[type="checkbox"]         { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
-html.dark input[type="checkbox"]:checked { background: #0d9488; border-color: #0d9488; }

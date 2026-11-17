@@ -2,12 +2,10 @@
 
 import dynamic from "next/dynamic";
 import { fetchEvSales, fetchEvData, fetchOilForecast, BASE } from "@/lib/data";
-import { useTheme } from "@/lib/theme-context";
 import { useDataFetch } from "@/lib/ui-utils";
 import type { OilRow, EvRow } from "@/lib/data";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import LoadingPlaceholder from "@/components/ui/LoadingPlaceholder";
-import FadeIn from "@/components/ui/FadeIn";
 import ChartCard from "@/components/ui/ChartCard";
 import { accentMap } from "@/components/ui/StatCard";
 import ChartLoader from "@/components/ui/ChartLoader";
@@ -43,13 +41,12 @@ const pillars = [
 ];
 
 export default function HomeClient() {
-  const { isDark } = useTheme();
   const { data: evSales,  error: evSalesError }  = useDataFetch<EvRow[]>(fetchEvSales, []);
   const { data: evData,   error: evDataError }   = useDataFetch<EvRow[]>(fetchEvData, []);
   const { data: oilData,  error: oilDataError }  = useDataFetch<OilRow[]>(fetchOilForecast, []);
 
   return (
-    <div className={`transition-colors duration-300 ${isDark ? "bg-black" : "bg-white"}`}>
+    <div className="transition-colors duration-300 bg-white">
       {/* Hero — full-viewport, pulled under fixed header */}
       <section aria-labelledby="hero-heading" className="relative overflow-hidden min-h-screen -mt-18">
         <img
@@ -63,9 +60,8 @@ export default function HomeClient() {
           style={{ objectPosition: "50% 75%" }}
           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
         />
-        {/* Gradient overlays — two layers cross-fading via opacity so the gradient animates smoothly */}
-        <div className="absolute inset-0 bg-linear-to-b from-transparent from-30% via-white/40 via-70% to-white transition-opacity duration-300" style={{ opacity: isDark ? 0 : 1 }} />
-        <div className="absolute inset-0 bg-linear-to-b from-black/20 from-30% via-black/60 via-70% to-black transition-opacity duration-300" style={{ opacity: isDark ? 1 : 0 }} />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-linear-to-b from-transparent from-30% via-white/40 via-70% to-white transition-opacity duration-300" />
         {/* Hero copy */}
         <div className="relative h-full flex flex-col items-start justify-center px-6 sm:px-12 md:px-24 py-16 sm:py-32 min-h-screen text-white">
           <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-7xl font-light tracking-tight mb-4 max-w-4xl drop-shadow-lg">
@@ -78,31 +74,27 @@ export default function HomeClient() {
       </section>
 
       {/* Heading + stats */}
-      <section aria-labelledby="stats-heading" className={`transition-colors duration-300 ${isDark ? "bg-black" : "bg-white"}`}>
+      <section aria-labelledby="stats-heading" className="transition-colors duration-300 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 text-center">
-          <FadeIn>
-            <h2 id="stats-heading" className={`text-4xl sm:text-5xl font-bold tracking-tight mb-4 ${isDark ? "text-white" : "text-slate-900"}`}>
-              EV Adoption &amp;{" "}
-              <span className={isDark ? "text-teal-400" : "text-teal-600"}>Oil Dependency</span>
-            </h2>
-            <p className={`max-w-2xl mx-auto text-base leading-relaxed mb-10 ${isDark ? "text-white/70" : "text-slate-500"}`}>
-              Does rising electric vehicle adoption measurably reduce oil dependency in oil-importing
-              countries — and how could the resulting savings fund clean energy infrastructure?
-            </p>
-          </FadeIn>
+          <h2 id="stats-heading" className="text-4xl sm:text-5xl font-bold tracking-tight mb-4 text-slate-900">
+            EV Adoption &amp;{" "}
+            <span className="text-teal-600">Oil Dependency</span>
+          </h2>
+          <p className="max-w-2xl mx-auto text-base leading-relaxed mb-10 text-slate-500">
+            Does rising electric vehicle adoption measurably reduce oil dependency in oil-importing
+            countries — and how could the resulting savings fund clean energy infrastructure?
+          </p>
 
-          <FadeIn delay={150}>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
-              {stats.map(({ value, label, accent }) => (
-                <div key={label} className={`rounded-xl p-4 border ${isDark ? "bg-white/5 border-white/10" : "bg-slate-50 border-slate-200"}`}>
-                  <dl className="flex flex-col-reverse gap-1">
-                    <dt className={`text-xs ${isDark ? "text-white/60" : "text-slate-500"}`}>{label}</dt>
-                    <dd className={`text-xl sm:text-2xl font-bold ${isDark ? accentMap[accent].dark : accentMap[accent].light}`}>{value}</dd>
-                  </dl>
-                </div>
-              ))}
-            </div>
-          </FadeIn>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto">
+            {stats.map(({ value, label, accent }) => (
+              <div key={label} className="rounded-xl p-4 border bg-slate-50 border-slate-200">
+                <dl className="flex flex-col-reverse gap-1">
+                  <dt className="text-xs text-slate-500">{label}</dt>
+                  <dd className={`text-xl sm:text-2xl font-bold ${accentMap[accent]}`}>{value}</dd>
+                </dl>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -117,14 +109,13 @@ export default function HomeClient() {
           linkHref="/ev-forecast/#ev-sales-by-country"
           linkLabel="Full Explorer"
           minHeightClass="min-h-64 sm:min-h-125"
-          isDark={isDark}
         >
           {evSales.length > 0 ? (
-            <EvShareChart data={evSales} preview isDark={isDark} />
+            <EvShareChart data={evSales} preview />
           ) : evSalesError ? (
-            <ErrorMessage message={evSalesError} isDark={isDark} />
+            <ErrorMessage message={evSalesError} />
           ) : (
-            <LoadingPlaceholder text="Loading data…" isDark={isDark} />
+            <LoadingPlaceholder text="Loading data…" />
           )}
         </ChartCard>
 
@@ -135,14 +126,13 @@ export default function HomeClient() {
           linkHref="/ev-forecast/#ev-sales-projections"
           linkLabel="Full Forecast"
           minHeightClass="min-h-64 sm:min-h-100"
-          isDark={isDark}
         >
           {evData.length > 0 ? (
-            <EvForecastChart data={evData} preview isDark={isDark} />
+            <EvForecastChart data={evData} preview />
           ) : evDataError ? (
-            <ErrorMessage message={evDataError} isDark={isDark} />
+            <ErrorMessage message={evDataError} />
           ) : (
-            <LoadingPlaceholder text="Loading data…" isDark={isDark} />
+            <LoadingPlaceholder text="Loading data…" />
           )}
         </ChartCard>
 
@@ -153,35 +143,30 @@ export default function HomeClient() {
           linkHref="/ev-gdp-impact/#oil-import-forecasts"
           linkLabel="Full Explorer"
           minHeightClass="min-h-64 sm:min-h-100"
-          isDark={isDark}
         >
           {oilData.length > 0 ? (
-            <OilForecastChart data={oilData} preview isDark={isDark} />
+            <OilForecastChart data={oilData} preview />
           ) : oilDataError ? (
-            <ErrorMessage message={oilDataError} isDark={isDark} />
+            <ErrorMessage message={oilDataError} />
           ) : (
-            <LoadingPlaceholder text="Loading data…" isDark={isDark} />
+            <LoadingPlaceholder text="Loading data…" />
           )}
         </ChartCard>
         </div>
       </section>
 
       {/* Project Goals */}
-      <section aria-labelledby="project-goals-heading" className={`border-t transition-colors duration-300 ${isDark ? "bg-black border-white/10" : "bg-white border-slate-200"}`}>
+      <section aria-labelledby="project-goals-heading" className="border-t transition-colors duration-300 bg-white border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-14">
-          <FadeIn>
-            <h2 id="project-goals-heading" className={`text-4xl mb-8 font-light ${isDark ? "text-white" : "text-black"}`}>
-              Project Goals
-            </h2>
-          </FadeIn>
+          <h2 id="project-goals-heading" className="text-4xl mb-8 font-light text-black">
+            Project Goals
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {pillars.map(({ title, body }, i) => (
-              <FadeIn key={title} delay={i * 80}>
-                <div className={`p-6 rounded-2xl border h-full ${isDark ? "bg-white/5 border-white/10" : "bg-white border-slate-200"}`}>
-                  <h3 className={`text-lg mb-3 font-medium ${isDark ? "text-white" : "text-black"}`}>{title}</h3>
-                  <p className={`text-sm leading-relaxed ${isDark ? "text-white/70" : "text-black/70"}`}>{body}</p>
-                </div>
-              </FadeIn>
+            {pillars.map(({ title, body }) => (
+              <div key={title} className="p-6 rounded-2xl border h-full bg-white border-slate-200">
+                <h3 className="text-lg mb-3 font-medium text-black">{title}</h3>
+                <p className="text-sm leading-relaxed text-black/70">{body}</p>
+              </div>
             ))}
           </div>
         </div>

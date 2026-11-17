@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { fetchEvSales, fetchEvData, fetchOilForecast, BASE } from "@/lib/data";
+import { fetchEvSales, fetchEvData, fetchOilForecast } from "@/lib/data";
 import { useDataFetch } from "@/lib/ui-utils";
 import type { OilRow, EvRow } from "@/lib/data";
 import ErrorMessage from "@/components/ui/ErrorMessage";
@@ -50,7 +50,7 @@ export default function HomeClient() {
       {/* Hero — full-viewport, pulled under fixed header */}
       <section aria-labelledby="hero-heading" className="relative overflow-hidden min-h-screen -mt-18">
         <img
-          src={`${BASE}/images/hero-bg.webp`}
+          src="/images/hero-bg.webp"
           alt=""
           aria-hidden="true"
           width={1920}

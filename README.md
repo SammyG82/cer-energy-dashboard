@@ -2,7 +2,7 @@
 
 A data-driven dashboard exploring whether rising electric vehicle adoption measurably reduces oil dependency in oil-importing countries, and how the resulting savings could fund clean energy infrastructure.
 
-**Live site:** https://sammyg82.github.io/cer-energy-dashboard/
+**Live site:** https://cer-energy-dashboard.vercel.app/
 
 ---
 
@@ -105,7 +105,7 @@ d. Open a pull request on GitHub:
    - Once you're happy with the changes and there are no merge conflicts, click **"Merge pull request"** — the live site will redeploy automatically
 
 **5. Get oriented**
-- The live site is at https://sammyg82.github.io/cer-energy-dashboard/ — any push to `main` auto-deploys
+- The live site is at https://cer-energy-dashboard.vercel.app/ — pushes to `main` deploy to production automatically; other branches/PRs get preview deployments
 - All frontend data files are in `public/data/` — charts read from there, never from `analysis/`
 - Chart components are in `components/charts/`, one file per chart
 - All data fetching and shared EV utilities are in `lib/data.ts`

@@ -1,7 +1,6 @@
 "use client";
 
 import PageHeader from "@/components/ui/PageHeader";
-import { BASE } from "@/lib/data";
 
 export default function AboutClient() {
   return (
@@ -168,7 +167,7 @@ export default function AboutClient() {
                     {files.map((f) => (
                       <a
                         key={f}
-                        href={`${BASE}/data/${f}`}
+                        href={`/data/${f}`}
                         download
                         aria-label={`Download ${f}`}
                         className="inline-flex items-center gap-1 text-xs font-mono px-2 py-1 rounded border transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 border-slate-200 text-teal-700 hover:border-slate-400"

@@ -1,7 +1,5 @@
 import * as d3 from "d3";
 
-export const BASE = process.env.NODE_ENV === "production" ? "/cer-energy-dashboard" : "";
-
 export const TOP_5_MARKETS = ["China", "USA", "Germany", "France", "United Kingdom"];
 
 // d3.csv returns "" for empty cells; trim() catches whitespace-only values
@@ -119,12 +117,12 @@ export function fmtEvSales(v: number): string {
 }
 
 export async function fetchEvSales(): Promise<EvRow[]> {
-  const raw = await d3.csv(`${BASE}/data/ev_sales.csv`);
+  const raw = await d3.csv("/data/ev_sales.csv");
   return raw.map(normalizeEvRow).filter((r): r is EvRow => r !== null);
 }
 
 export async function fetchEvData(): Promise<EvRow[]> {
-  const raw = await d3.json<unknown[]>(`${BASE}/data/ev_data.json`);
+  const raw = await d3.json<unknown[]>("/data/ev_data.json");
   if (!Array.isArray(raw)) throw new Error("Invalid EV data");
   return raw
     .filter((item): item is Parameters<typeof normalizeEvRow>[0] => item !== null && typeof item === "object" && !Array.isArray(item))
@@ -142,7 +140,7 @@ function createOilFetcher(
   filterZeroHistorical = false
 ): () => Promise<OilRow[]> {
   return async function fetchOilData() {
-    const raw = await d3.csv(`${BASE}/data/${filename}`);
+    const raw = await d3.csv(`/data/${filename}`);
     return raw
       .flatMap((d) => {
         const Type = assertOilType(d.Type);
@@ -180,7 +178,7 @@ export const fetchOilExports = createOilFetcher(
 );
 
 export async function fetchGdpMeta(): Promise<GdpMeta[]> {
-  const raw = await d3.json<unknown[]>(`${BASE}/data/gdp_country_meta.json`);
+  const raw = await d3.json<unknown[]>("/data/gdp_country_meta.json");
   if (!Array.isArray(raw)) throw new Error("Invalid GDP metadata");
   return raw.map((item, idx) => {
     if (item === null || typeof item !== "object") {
@@ -209,7 +207,7 @@ export interface OilPriceRow {
 const isNullableNum = (v: unknown): v is number | null => v === null || (typeof v === "number" && Number.isFinite(v));
 
 export async function fetchOilPrices(): Promise<OilPriceRow[]> {
-  const raw = await d3.json<unknown[]>(`${BASE}/data/oil_prices.json`);
+  const raw = await d3.json<unknown[]>("/data/oil_prices.json");
   if (!Array.isArray(raw)) throw new Error("Invalid oil price data");
   return raw.map((item, idx) => {
     if (item === null || typeof item !== "object") throw new Error(`Invalid oil price data at row ${idx}`);

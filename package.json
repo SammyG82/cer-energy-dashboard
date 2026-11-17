@@ -10,9 +10,8 @@
     "dev": "next dev",
     "prebuild": "npm run clean",
     "build": "next build",
-    "serve": "npx serve out",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf .next out"
+    "clean": "rm -rf .next"
   },
   "dependencies": {
     "d3": "^7.9.0",
@@ -27,7 +26,6 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "serve": "^14",
     "tailwindcss": "4.2.4",
     "typescript": "^5"
   }

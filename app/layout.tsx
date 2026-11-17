@@ -14,7 +14,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-import { SITE_ORIGIN, SITE_URL } from "@/lib/site";
+import { SITE_ORIGIN } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     description:
       "A data-driven dashboard exploring EV adoption, oil dependency, and clean energy infrastructure across 50+ countries.",
     type: "website",
-    url: `${SITE_URL}/`,
+    url: `${SITE_ORIGIN}/`,
   },
 };
 

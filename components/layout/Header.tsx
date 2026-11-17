@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { BASE } from "@/lib/data";
 
 function headerButtonClasses(isTransparent: boolean): string {
   return `py-3 rounded-full border transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
@@ -115,7 +114,7 @@ export default function Header() {
             }`}
           >
             <img
-              src={`${BASE}/images/logo.webp`}
+              src="/images/logo.webp"
               alt=""
               aria-hidden="true"
               width={490}

@@ -15,7 +15,7 @@ const EvForecastChart = dynamic(() => import("@/components/charts/EvForecastChar
 const OilForecastChart = dynamic(() => import("@/components/charts/OilForecastChart"), { ssr: false, loading: ChartLoader });
 
 const stats: { value: string; label: string; accent: keyof typeof accentMap }[] = [
-  { value: "~18%",       label: "Global EV new-car share",     accent: "blue"  },
+  { value: "20%+",       label: "Global EV new-car share",     accent: "blue"  },
   { value: "↓2.4 Mb/d", label: "Oil displaced by EVs (2023)", accent: "teal"  },
   { value: "50+",        label: "Countries in dataset",        accent: "amber" },
   { value: "2010–2035",  label: "Data time span",              accent: "blue"  },

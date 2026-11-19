@@ -28,7 +28,7 @@ const pillars = [
   },
   {
     title: "Oil Import Pressure",
-    body: "Analyze how rising EV adoption correlates with declining oil import volumes in oil-importing countries, controlling for GDP growth.",
+    body: "Analyze how rising EV adoption correlates with declining oil import volumes in oil-importing countries.",
   },
   {
     title: "Infrastructure Dividend",

@@ -6,7 +6,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "predev": "node -e \"require('fs').rmSync('.next/cache',{recursive:true,force:true})\"",
+    "predev": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
     "dev": "next dev",
     "prebuild": "npm run clean",
     "build": "next build",

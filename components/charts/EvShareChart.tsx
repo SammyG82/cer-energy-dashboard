@@ -31,10 +31,7 @@ export default function EvShareChart({ data, preview = false }: Props) {
   const { width: containerWidth, height: containerHeight } = useContainerSize(containerRef);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
-  const [excluded, setExcluded] = useState<Set<string>>(new Set());
-  const prevSvgParamsRef = useRef<{ containerWidth: number; preview: boolean; data: EvRow[]; excluded: Set<string> } | null>(null);
-  const focusIndexAfterRedrawRef = useRef<number | null>(null);
-  const suppressNextFocusTooltipRef = useRef(false);
+  const prevSvgParamsRef = useRef<{ containerWidth: number; preview: boolean; data: EvRow[] } | null>(null);
 
   const topN = preview ? 10 : 20;
 
@@ -51,28 +48,21 @@ export default function EvShareChart({ data, preview = false }: Props) {
   useEffect(() => {
     setTooltip(null);
     setTooltipPos(null);
-  }, [year, data, containerWidth, excluded]);
-
-  useEffect(() => {
-    setExcluded(new Set());
-  }, [data]);
+  }, [year, data, containerWidth]);
 
   const filtered = useMemo(
     () => data
       .filter((d) => d.year === year && !AGGREGATES.has(d.region_country))
       .sort((a, b) => b.ev_sales - a.ev_sales)
-      .filter((d) => !excluded.has(d.region_country))
       .slice(0, topN),
-    [data, year, topN, excluded]
+    [data, year, topN]
   );
 
   // EU27 injected separately so it appears in its natural rank position without
   // being counted in the stat card totals (it overlaps with individual EU countries).
   const eu27Row = useMemo(
-    () => !excluded.has("EU27")
-      ? (data.find((d) => d.year === year && d.region_country === "EU27") ?? null)
-      : null,
-    [data, year, excluded]
+    () => data.find((d) => d.year === year && d.region_country === "EU27") ?? null,
+    [data, year]
   );
 
   const displayRows = useMemo(() => {
@@ -95,8 +85,8 @@ export default function EvShareChart({ data, preview = false }: Props) {
 
     const prev = prevSvgParamsRef.current;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const animate = !reducedMotion && (!prev || prev.containerWidth !== containerWidth || prev.preview !== preview || prev.data !== data || prev.excluded !== excluded);
-    prevSvgParamsRef.current = { containerWidth, preview, data, excluded };
+    const animate = !reducedMotion && (!prev || prev.containerWidth !== containerWidth || prev.preview !== preview || prev.data !== data);
+    prevSvgParamsRef.current = { containerWidth, preview, data };
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
@@ -156,7 +146,9 @@ export default function EvShareChart({ data, preview = false }: Props) {
 
     let activeBar: string | null = null;
     barsSel
-      .attr("cursor", "pointer")
+      .attr("tabindex", "0")
+      .attr("role", "img")
+      .attr("aria-label", (d) => `${dn(d.region_country)}: ${fmtEvSales(d.ev_sales)} vehicles`)
       .on("pointermove", function (event, d) {
         const isEU = d.region_country === "EU27";
         if (activeBar !== d.region_country) {
@@ -178,29 +170,8 @@ export default function EvShareChart({ data, preview = false }: Props) {
         setTooltip(null);
         setTooltipPos(null);
       })
-      .on("click", (_event, d) => {
-        setTooltip(null);
-        setTooltipPos(null);
-        setExcluded((prev) => new Set([...prev, d.region_country]));
-      });
-
-    barsSel
-      .attr("tabindex", "0")
-      .attr("role", "button")
-      .attr("aria-label", (d) => `${dn(d.region_country)}: ${fmtEvSales(d.ev_sales)} vehicles — click to hide`)
-      .on("keydown", function (event, d) {
-        const e = event as KeyboardEvent;
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          focusIndexAfterRedrawRef.current = displayRows.findIndex((r) => r.region_country === d.region_country);
-          setTooltip(null);
-          setTooltipPos(null);
-          setExcluded((prev) => new Set([...prev, d.region_country]));
-        }
-      })
       .on("focus", function (_, d) {
         d3.select(this).style("outline", `2px solid ${CHART_TEXT}`).style("outline-offset", "2px");
-        if (suppressNextFocusTooltipRef.current) { suppressNextFocusTooltipRef.current = false; return; }
         const rect = (this as SVGRectElement).getBoundingClientRect();
         const containerRect = containerRef.current?.getBoundingClientRect();
         if (containerRect) {
@@ -245,33 +216,6 @@ export default function EvShareChart({ data, preview = false }: Props) {
       .selectAll<SVGTextElement, string>("text")
       .attr("dx", -6)
       .style("font-size", axisFontSize)
-      .attr("cursor", "pointer")
-      .attr("tabindex", "0")
-      .attr("role", "button")
-      .attr("aria-label", (countryDisplay) => `Hide ${countryDisplay}`)
-      .on("click", (_event, countryDisplay) => {
-        const row = displayRows.find((d) => dn(d.region_country) === countryDisplay);
-        if (row) {
-          setTooltip(null);
-          setTooltipPos(null);
-          setExcluded((prev) => new Set([...prev, row.region_country]));
-        }
-      })
-      .on("keydown", function (event, countryDisplay) {
-        const e = event as KeyboardEvent;
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          const row = displayRows.find((d) => dn(d.region_country) === countryDisplay);
-          if (row) {
-            focusIndexAfterRedrawRef.current = displayRows.findIndex((d) => d.region_country === row.region_country);
-            setTooltip(null);
-            setTooltipPos(null);
-            setExcluded((prev) => new Set([...prev, row.region_country]));
-          }
-        }
-      })
-      .on("focus", function () { d3.select(this).style("outline", `2px solid ${CHART_TEXT}`).style("outline-offset", "2px"); })
-      .on("blur", function () { d3.select(this).style("outline", null).style("outline-offset", null); })
       .each(function (countryDisplay) {
         if (countryDisplay !== dn("EU27")) return;
         d3.select(this)
@@ -283,22 +227,7 @@ export default function EvShareChart({ data, preview = false }: Props) {
           .text("*");
       });
 
-    if (focusIndexAfterRedrawRef.current !== null) {
-      const idx = Math.min(focusIndexAfterRedrawRef.current, displayRows.length - 1);
-      focusIndexAfterRedrawRef.current = null;
-      if (idx >= 0 && svgRef.current) {
-        const bar = svgRef.current.querySelectorAll<SVGRectElement>(".bar")[idx] as SVGRectElement | undefined;
-        if (bar) { suppressNextFocusTooltipRef.current = true; bar.focus(); }
-      }
-    }
-  }, [displayRows, preview, containerWidth, total, excluded]);
-
-  // Keep excluded-count label accurate for EU27
-  const excludedCountries = useMemo(
-    () => [...excluded].filter((r) => r !== "EU27"),
-    [excluded]
-  );
-  const eu27Hidden = excluded.has("EU27");
+  }, [displayRows, preview, containerWidth, total]);
 
   const leader = filtered[0];
 
@@ -310,7 +239,6 @@ export default function EvShareChart({ data, preview = false }: Props) {
   }, [year, forecastBoundary, leader, topN, total, eu27Row]);
 
   const isProjected = year >= forecastBoundary;
-  const excludedLabel = excludedCountries.length > 0 ? ` (excl. ${excludedCountries.length})` : "";
 
   const yearSlider = years.length > 0 ? (
     <div className="flex flex-col gap-1.5">
@@ -337,42 +265,15 @@ export default function EvShareChart({ data, preview = false }: Props) {
       {yearSlider}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <StatCard size="xl" label={`${isProjected ? "Projected " : ""}Total Sales of Top ${topN}${excludedLabel}`} value={fmtEvSales(total)} accent="blue" />
-        <StatCard size="xl" label={`${isProjected ? "Projected " : ""}Leader${excludedLabel}`} value={leader ? dn(leader.region_country) : "—"} accent="teal" />
-        <StatCard size="xl" label={`${isProjected ? "Projected " : ""}Leader Share of Top ${topN}${excludedLabel}`} value={leader && total ? ((leader.ev_sales / total) * 100).toFixed(0) + "%" : "—"} accent="amber" />
+        <StatCard size="xl" label={`${isProjected ? "Projected " : ""}Total Sales of Top ${topN}`} value={fmtEvSales(total)} accent="blue" />
+        <StatCard size="xl" label={`${isProjected ? "Projected " : ""}Leader`} value={leader ? dn(leader.region_country) : "—"} accent="teal" />
+        <StatCard size="xl" label={`${isProjected ? "Projected " : ""}Leader Share of Top ${topN}`} value={leader && total ? ((leader.ev_sales / total) * 100).toFixed(0) + "%" : "—"} accent="amber" />
       </div>
-
-      {(excludedCountries.length > 0 || eu27Hidden) && (
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-slate-400">
-            {[
-              excludedCountries.length > 0 && `${excludedCountries.length} ${excludedCountries.length === 1 ? "country" : "countries"} hidden`,
-              eu27Hidden && "EU hidden",
-            ].filter(Boolean).join(" · ")} — click a bar or name to hide, or
-          </span>
-          <button
-            type="button"
-            aria-label="Reset all hidden countries"
-            onClick={() => setExcluded(new Set())}
-            className="text-xs font-medium px-2 py-0.5 rounded focus:outline-none focus:ring-2 focus:ring-slate-500 bg-slate-100 text-slate-600 hover:bg-slate-200"
-          >
-            Reset
-          </button>
-        </div>
-      )}
 
       <div ref={containerRef} className="w-full relative" style={{ touchAction: "manipulation" }}>
         {displayRows.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-3 py-16 rounded-xl border border-slate-200 text-slate-400">
-            <span className="text-sm">All countries hidden.</span>
-            <button
-              type="button"
-              aria-label="Reset all hidden countries"
-              onClick={() => setExcluded(new Set())}
-              className="text-xs font-medium px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-slate-500 bg-slate-100 text-slate-600 hover:bg-slate-200"
-            >
-              Reset
-            </button>
+          <div className="flex items-center justify-center py-16 rounded-xl border border-slate-200 text-slate-400">
+            <span className="text-sm">No data available for {year}.</span>
           </div>
         ) : (
           <svg ref={svgRef} className="w-full" role="img" aria-label={ariaLabel} />
